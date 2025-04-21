@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "mcmmod",
+	"version": "0.0.2",
+	"name": "McmMod",
+	"description": "A Fabric port for MCMMO",
+	"authors": [
+		"PietPiper!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/mcmmod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"pietpiper.mcmmod.McmMod"
+		],
+		"fabric-datagen": [
+			"pietpiper.mcmmod.datagen.McmModDataGenerator"
+		],
+		"client": [
+			"pietpiper.mcmmod.McmModClient"
+		]
+	},
+	"mixins": [
+		"mcmmod.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.13",
+		"minecraft": "~1.21.5",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
