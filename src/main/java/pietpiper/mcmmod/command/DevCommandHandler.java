@@ -85,7 +85,7 @@ public class DevCommandHandler {
     }
 
     //Prints the amount of experience the target player currently has towards their next level up in the specified skill.
-    private static int getXP(CommandContext<ServerCommandSource> ctx, String targetName) throws CommandSyntaxException {
+    private static int getXP(CommandContext<ServerCommandSource> ctx, String targetName) {
         String skillName = StringArgumentType.getString(ctx, "skill");
         Skill skill = Skill.fromName(skillName);
         if (skill == null) {
@@ -290,7 +290,7 @@ public class DevCommandHandler {
         }
 
         int curLvl = PlayerDataManager.getLevel(player.getUuid(), skill);
-        PlayerDataManager.setLevel(player.getUuid(), lvlsToAdd, skill);
+        PlayerDataManager.setLevel(player.getUuid(), curLvl + lvlsToAdd, skill);
         ctx.getSource().sendFeedback(
                 () -> Text.literal(lvlsToAdd + " levels have been added to " + player.getName().getString() + "'s " + skill.getDisplayName() + " skill."),
                 false

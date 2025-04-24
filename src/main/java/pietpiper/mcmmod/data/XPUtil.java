@@ -77,14 +77,12 @@ public class XPUtil {
             // Precomputed XP required to reach level 2000
             int f2000 = 10 * 2000 * (101 + 2000);
 
-            int x = level;
-
             // Quadratic XP scaling after level 2000 (carryover curve)
             // Derived from: 5 * ((x - 1)x - (2000 * 1999)) / 2
-            int quad = (((x - 1) * x) - (2000 * 1999)) / 2;
+            int quad = (((level - 1) * level) - (2000 * 1999)) / 2;
 
             // Linear component for the tail of the XP curve
-            int linear = 31020 * (x - 2000);
+            int linear = 31020 * (level - 2000);
 
             // Final lifetime XP required for level > 2000
             return f2000 + 5 * quad + linear;
