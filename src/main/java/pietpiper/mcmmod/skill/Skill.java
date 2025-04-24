@@ -60,7 +60,7 @@ public enum Skill {
         return colorHex;
     }
 
-    /** Returns a short description of the skill's theme and behavior */
+    /** Returns a short description of the skill */
     public String getDescription() {
         return description;
     }

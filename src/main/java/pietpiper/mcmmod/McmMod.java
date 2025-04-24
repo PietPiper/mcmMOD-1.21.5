@@ -1,12 +1,14 @@
 package pietpiper.mcmmod;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pietpiper.mcmmod.command.DevCommandHandler;
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.util.ServerReference;
 
@@ -32,6 +34,10 @@ public class McmMod implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			SQLiteManager.connect(server);
 			ServerReference.setServer(server);
+		});
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			DevCommandHandler.register(dispatcher);
 		});
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {

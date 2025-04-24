@@ -62,12 +62,12 @@ public class XPUtil {
     /**
      * Calculates the total XP required to reach a given level from level 0.
      *
-     * This uses a piecewise function:
+     * Uses a piecewise function:
      * - For levels 0 to 2000: 10x(101 + x)
      * - For levels > 2000: continues with a quadratic and linear tail.
      *
      * @param level The level to reach
-     * @return The total XP required from level 0 to the specified level
+     * @return The total XP required from level 0 to get to the specified level
      */
     public static int getTotalXPToReachLevel(int level) {
         if (level <= 2000) {
