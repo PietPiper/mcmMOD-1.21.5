@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import pietpiper.mcmmod.config.ConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.data.XPUtil;
 import pietpiper.mcmmod.skill.Skill;
@@ -81,7 +82,18 @@ public class DevCommandHandler {
                 .then(literal("resetPlayerData")
                         .then(argument("player", StringArgumentType.word())
                                 .executes(ctx -> resetPlayerSkills(ctx, StringArgumentType.getString(ctx, "player")))))
+                .then(literal("getMaxLevel")
+                        .executes(DevCommandHandler::maxLvlFromConfig))
         );
+    }
+
+    private static int maxLvlFromConfig(CommandContext<ServerCommandSource> ctx) {
+        int maxLvl = ConfigManager.getConfig().maxLevel;
+        ctx.getSource().sendFeedback(
+                () -> Text.literal("The max level is " + maxLvl + " read from the config file!"),
+                false
+        );
+        return 1;
     }
 
     //Prints the amount of experience the target player currently has towards their next level up in the specified skill.

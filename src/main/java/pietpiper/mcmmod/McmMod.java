@@ -9,6 +9,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pietpiper.mcmmod.command.DevCommandHandler;
+import pietpiper.mcmmod.config.ConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.util.ServerReference;
 
@@ -30,14 +31,11 @@ public class McmMod implements ModInitializer {
 
 		LOGGER.info("Hello Fabric world!");
 
-		//Initialze or connect database.
+		//Initialze server reference for message broadcasting, load the config, initialize or connect database IN THAT ORDER.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			SQLiteManager.connect(server);
 			ServerReference.setServer(server);
-		});
-
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-			DevCommandHandler.register(dispatcher);
+			ConfigManager.load();
 		});
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -50,6 +48,9 @@ public class McmMod implements ModInitializer {
 			ServerReference.broadcast("Initialized player data for " + player.getName());
 		});
 
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			DevCommandHandler.register(dispatcher);
+		});
 
 	}
 
