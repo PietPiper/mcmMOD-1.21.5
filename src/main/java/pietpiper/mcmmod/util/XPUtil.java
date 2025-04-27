@@ -1,5 +1,6 @@
-package pietpiper.mcmmod.data;
+package pietpiper.mcmmod.util;
 
+import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.skill.Skill;
 
 import java.util.UUID;
@@ -26,7 +27,7 @@ public class XPUtil {
 
     /**
      * Adds XP to a given skill for a player and handles level-up logic.
-     *
+     * ToDO: Add level up listening functionality
      * @param uuid  the player's UUID
      * @param skill the skill to modify
      * @param amount the amount of XP to add

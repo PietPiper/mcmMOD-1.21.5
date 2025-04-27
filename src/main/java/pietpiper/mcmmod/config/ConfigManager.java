@@ -1,5 +1,6 @@
 package pietpiper.mcmmod.config;
 
+import net.fabricmc.loader.api.FabricLoader;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 
 public class ConfigManager {
-    private static final File CONFIG_FILE = new File("config/mcmmod.yml");
+    private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().resolve("mcmmod.yml").toString());
     private static McmmodConfig config;
 
     public static void load() {
@@ -39,14 +40,54 @@ public class ConfigManager {
         # Mcmmod Configuration
         # This file controls global settings for the mod
 
-        # Default XP bar color in hex (e.g., 0x00FFAA) (currently not in hex but I need to make some changes to make sure it works);
-        defaultXpBarColor: 65450
+        # Default colors for each skill in hex (e.g., 0x00FFAA).
+        # Used for the XP bars, scoreboards and other GUI elements.
+        # Players can also individually customize these for themselves!
+        defaultFishingColor: 0x00FFFF
+        defaultTamingColor: 0xFFAA00
+        defaultMiningColor: 0xAAAAAA
+        defaultAcrobaticsColor: 0xFFFFFF
+        defaultWoodcuttingColor: 0x00AA00
+        defaultHerbalismColor: 0x55FF55
+        defaultExcavationColor: 0xFFFF55
+        defaultUnarmedColor: 0xAA00AA
+        defaultArcheryColor: 0xAA00AA
+        defaultSwordsColor: 0xAA0000
+        defaultAxesColor: 0x00AAAA
+        defaultAlchemyColor: 0xFF55FF
+        defaultSmeltingColor: 0x0000AA
+        defaultEnchantingColor: 0x5555FF
+        defaultGlidingColor: 0x000000
 
-        # Whether the XP bar is shown to players
-        showXpBar: true
-
+        #==== Global Server Settings ====
+        
         # Maximum skill level players can reach
         maxLevel: 10000
+        
+        # Whether the XP bar is shown to players. (TODO: Add for individual skills)
+        showXpBar: true
+
+        # Whether or not active skills are enabled on the server.
+        enableActiveSkills: true
+        
+        # Whether each skill is enabled on the server.
+        enableFishing: true
+        enableTaming: true
+        enableMining: true
+        enableAcrobatics: true
+        enableWoodcutting: true
+        enableHerbalism: true
+        enableExcavation: true
+        enableUnarmed: true
+        enableArchery: true
+        enableSwords: true
+        enableAxes: true
+        enableAlchemy: true
+        enableSmelting: true
+        enableEnchanting: true
+        enableGliding: true
+        
+        
         """;
 
         try (FileWriter writer = new FileWriter(CONFIG_FILE)) {

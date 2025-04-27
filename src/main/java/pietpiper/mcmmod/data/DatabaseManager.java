@@ -1,7 +1,8 @@
-package pietpiper.mcmmod;
+package pietpiper.mcmmod.data;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.WorldSavePath;
 import pietpiper.mcmmod.skill.Skill;
 
 import java.nio.file.Path;
@@ -16,7 +17,7 @@ import java.sql.Statement;
  * It creates a table named 'player_stats' that stores XP, RemainingXP, and Level
  * for each defined skill per player (keyed by UUID).
  */
-public class SQLiteManager {
+public class DatabaseManager {
     // The singleton database connection shared across the mod
     private static Connection connection;
 
@@ -27,9 +28,7 @@ public class SQLiteManager {
     public static void connect(MinecraftServer server) {
         try {
             // Locate the path to the world save folder and create a database file inside it
-            Path dbPath = FabricLoader.getInstance()
-                    .getGameDir()
-                    .resolve("world") // Store the DB inside the active world folder
+            Path dbPath = server.getSavePath(WorldSavePath.ROOT) // Store the DB inside the active world folder
                     .resolve("playerdata.db");
 
             // Establish connection — assign to shared field, not a local shadow
@@ -51,7 +50,8 @@ public class SQLiteManager {
                             .append(",\n")
                             .append(name).append("_level INTEGER NOT NULL");
                 }
-
+                sql.append(",\n")
+                        .append("settings TEXT NOT NULL");
                 sql.append("\n);"); // Close the CREATE TABLE statement
 
                 stmt.executeUpdate(sql.toString());

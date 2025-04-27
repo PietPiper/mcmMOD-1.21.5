@@ -39,6 +39,7 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+	include implementation("com.google.code.gson:gson:2.10.1")
 	include implementation("org.yaml:snakeyaml:2.4")
 	include implementation("org.xerial:sqlite-jdbc:3.43.2.2")
 	modImplementation "net.fabricmc.fabric-api:fabric-networking-api-v1:${project.fabric_version}"

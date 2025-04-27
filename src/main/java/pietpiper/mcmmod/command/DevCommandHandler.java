@@ -4,13 +4,12 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import pietpiper.mcmmod.config.ConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
-import pietpiper.mcmmod.data.XPUtil;
+import pietpiper.mcmmod.util.XPUtil;
 import pietpiper.mcmmod.skill.Skill;
 
 import java.util.UUID;
@@ -220,7 +219,7 @@ public class DevCommandHandler {
             return 0;
         }
 
-        PlayerDataManager.setLevel(player.getUuid(), xpToSet, skill);
+        PlayerDataManager.setXP(player.getUuid(), xpToSet, skill);
         ctx.getSource().sendFeedback(
                 () -> Text.literal(player.getName().getString() + " " + skill.getDisplayName() + " XP has been set to " + xpToSet + "."),
                 false
@@ -247,7 +246,7 @@ public class DevCommandHandler {
             return 0;
         }
 
-        PlayerDataManager.setLevel(player.getUuid(), remainingXPToSet, skill);
+        PlayerDataManager.setRemainingXP(player.getUuid(), remainingXPToSet, skill);
         ctx.getSource().sendFeedback(
                 () -> Text.literal(player.getName().getString() + " " + skill.getDisplayName() + " remaining XP has been set to " + remainingXPToSet + "."),
                 false

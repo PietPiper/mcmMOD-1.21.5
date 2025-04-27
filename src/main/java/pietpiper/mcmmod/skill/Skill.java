@@ -1,5 +1,7 @@
 package pietpiper.mcmmod.skill;
 
+import pietpiper.mcmmod.config.ConfigManager;
+
 /**
  * The Skill enum defines all skill types used in Mcmmod.
  *
@@ -14,22 +16,21 @@ package pietpiper.mcmmod.skill;
  * To add a new skill, define it here
  */
 public enum Skill {
-    FISHING("Fishing", 0x00FFFF, "Cast lines and catch fish."),         // Aqua
-    TAMING("Taming", 0xFFAA00, "Tame and use passive mobs."),           // Gold
-    MINING("Mining", 0xAAAAAA, "Break naturally generated blocks with a pick."), // Gray
-    ACROBATICS("Acrobatics", 0xFFFFFF, "Take fall damage and roll."),   // White
-    WOODCUTTING("Woodcutting", 0x00AA00, "Chop logs."),                 // Dark Green
-    HERBALISM("Herbalism", 0x55FF55, "Harvest crops and plants."),      // Green
-    EXCAVATION("Excavation", 0xFFFF55, "Dig naturally generated blocks with a shovel."), // Yellow
-    UNARMED("Unarmed", 0xFF5555, "Fight without weapons."),             // Red
-    ARCHERY("Archery", 0xAA00AA, "Shoot stuff."),                       // Dark Purple
-    SWORDS("Swords", 0xAA0000, "Slash enemies with swords."),           // Dark Red
-    AXES("Axes", 0x00AAAA, "Chop and cleave with axes."),              // Dark Aqua
-    ALCHEMY("Alchemy", 0xFF55FF, "Brew potions."),                      // Light Purple
-    SALVAGE("Salvage", 0x555555, "Recover enchantments from gear [If you know enough about them :)]."), // Dark Gray
-    SMELTING("Smelting", 0x0000AA, "Smelt stuff."),                     // Dark Blue
-    ENCHANTING("Enchanting", 0x5555FF, "Empower items with enchantments or remove them."), // Blue
-    GLIDING("Gliding", 0x000000, "Fly through the sky with elytra!");   // Black
+    FISHING("Fishing", ConfigManager.getConfig().defaultFishingColor, "Cast lines and catch fish."),         // Aqua
+    TAMING("Taming", ConfigManager.getConfig().defaultTamingColor, "Tame and use passive mobs."),           // Gold
+    MINING("Mining", ConfigManager.getConfig().defaultMiningColor, "Break naturally generated blocks with a pick."), // Gray
+    ACROBATICS("Acrobatics", ConfigManager.getConfig().defaultAcrobaticsColor, "Take fall damage and roll."),   // White
+    WOODCUTTING("Woodcutting", ConfigManager.getConfig().defaultWoodcuttingColor, "Chop logs."),                 // Dark Green
+    HERBALISM("Herbalism", ConfigManager.getConfig().defaultHerbalismColor, "Harvest crops and plants."),      // Green
+    EXCAVATION("Excavation", ConfigManager.getConfig().defaultExcavationColor, "Dig naturally generated blocks with a shovel."), // Yellow
+    UNARMED("Unarmed", ConfigManager.getConfig().defaultUnarmedColor, "Fight without weapons."),             // Red
+    ARCHERY("Archery", ConfigManager.getConfig().defaultArcheryColor, "Shoot stuff."),                       // Dark Purple
+    SWORDS("Swords", ConfigManager.getConfig().defaultSwordsColor, "Slash enemies with swords."),           // Dark Red
+    AXES("Axes", ConfigManager.getConfig().defaultAxesColor, "Chop and cleave with axes."),              // Dark Aqua
+    ALCHEMY("Alchemy", ConfigManager.getConfig().defaultAlchemyColor, "Brew potions."),                      // Light Purple
+    SMELTING("Smelting", ConfigManager.getConfig().defaultSmeltingColor, "Smelt stuff."),                     // Dark Blue
+    ENCHANTING("Enchanting", ConfigManager.getConfig().defaultEnchantingColor, "Empower items with enchantments or remove them."), // Blue
+    GLIDING("Gliding", ConfigManager.getConfig().defaultGlidingColor, "Fly through the sky with elytra!");   // Black
 
     // The human-friendly name used in UI and commands
     private final String displayName;

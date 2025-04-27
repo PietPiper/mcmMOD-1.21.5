@@ -4,13 +4,13 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pietpiper.mcmmod.command.DevCommandHandler;
 import pietpiper.mcmmod.config.ConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
+import pietpiper.mcmmod.data.DatabaseManager;
 import pietpiper.mcmmod.util.ServerReference;
 
 import java.util.UUID;
@@ -33,9 +33,9 @@ public class McmMod implements ModInitializer {
 
 		//Initialze server reference for message broadcasting, load the config, initialize or connect database IN THAT ORDER.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			SQLiteManager.connect(server);
-			ServerReference.setServer(server);
 			ConfigManager.load();
+			DatabaseManager.connect(server);
+			ServerReference.setServer(server);
 		});
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {

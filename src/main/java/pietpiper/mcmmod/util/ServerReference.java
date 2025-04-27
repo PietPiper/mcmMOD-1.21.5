@@ -8,6 +8,7 @@ import net.minecraft.server.MinecraftServer;
  */
 public class ServerReference {
     private static MinecraftServer server;
+    //ToDO: Add to confi file
     public static final boolean DEBUG_MODE = true;
 
     /**
