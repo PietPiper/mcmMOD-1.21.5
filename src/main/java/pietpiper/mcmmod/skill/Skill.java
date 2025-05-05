@@ -11,32 +11,30 @@ import pietpiper.mcmmod.config.ConfigManager;
  * This enum is used throughout the mod for:
  * - Displaying XP bars and skill names
  * - Initializing and accessing the correct database columns for each skill
- * - Typing skill parameters and avoiding spelling mistakes or referencing non-existant skills
+ * - Typing skill parameters and avoiding spelling mistakes or referencing non-existent skills
  *
  * To add a new skill, define it here
  */
 public enum Skill {
-    FISHING("Fishing", ConfigManager.getConfig().defaultFishingColor, "Cast lines and catch fish."),         // Aqua
-    TAMING("Taming", ConfigManager.getConfig().defaultTamingColor, "Tame and use passive mobs."),           // Gold
-    MINING("Mining", ConfigManager.getConfig().defaultMiningColor, "Break naturally generated blocks with a pick."), // Gray
-    ACROBATICS("Acrobatics", ConfigManager.getConfig().defaultAcrobaticsColor, "Take fall damage and roll."),   // White
-    WOODCUTTING("Woodcutting", ConfigManager.getConfig().defaultWoodcuttingColor, "Chop logs."),                 // Dark Green
-    HERBALISM("Herbalism", ConfigManager.getConfig().defaultHerbalismColor, "Harvest crops and plants."),      // Green
-    EXCAVATION("Excavation", ConfigManager.getConfig().defaultExcavationColor, "Dig naturally generated blocks with a shovel."), // Yellow
-    UNARMED("Unarmed", ConfigManager.getConfig().defaultUnarmedColor, "Fight without weapons."),             // Red
-    ARCHERY("Archery", ConfigManager.getConfig().defaultArcheryColor, "Shoot stuff."),                       // Dark Purple
-    SWORDS("Swords", ConfigManager.getConfig().defaultSwordsColor, "Slash enemies with swords."),           // Dark Red
-    AXES("Axes", ConfigManager.getConfig().defaultAxesColor, "Chop and cleave with axes."),              // Dark Aqua
-    ALCHEMY("Alchemy", ConfigManager.getConfig().defaultAlchemyColor, "Brew potions."),                      // Light Purple
-    SMELTING("Smelting", ConfigManager.getConfig().defaultSmeltingColor, "Smelt stuff."),                     // Dark Blue
-    ENCHANTING("Enchanting", ConfigManager.getConfig().defaultEnchantingColor, "Empower items with enchantments or remove them."), // Blue
-    GLIDING("Gliding", ConfigManager.getConfig().defaultGlidingColor, "Fly through the sky with elytra!");   // Black
+    FISHING("Fishing", "Cast lines and catch fish."),         // Aqua
+    TAMING("Taming", "Tame and use passive mobs."),           // Gold
+    MINING("Mining", "Break naturally generated blocks with a pick."), // Gray
+    ACROBATICS("Acrobatics", "Take fall damage and roll."),   // White
+    WOODCUTTING("Woodcutting", "Chop logs."),                 // Dark Green
+    HERBALISM("Herbalism", "Harvest crops and plants."),      // Green
+    EXCAVATION("Excavation", "Dig naturally generated blocks with a shovel."), // Yellow
+    UNARMED("Unarmed", "Fight without weapons."),             // Red
+    ARCHERY("Archery", "Shoot stuff."),                       // Dark Purple
+    SWORDS("Swords", "Slash enemies with swords."),           // Dark Red
+    AXES("Axes", "Chop and cleave with axes."),              // Dark Aqua
+    ALCHEMY("Alchemy", "Brew potions."),                      // Light Purple
+    SMELTING("Smelting", "Smelt stuff."),                     // Dark Blue
+    ENCHANTING("Enchanting", "Empower items with enchantments or remove them."), // Blue
+    GLIDING("Gliding", "Fly through the sky with elytra!");   // Black
 
     // The human-friendly name used in UI and commands
     private final String displayName;
 
-    // The Minecraft text color hex code used when rendering this skill in messages/bars
-    private final int colorHex;
 
     // Short description of the skill shown in help menus, hover text, etc.
     private final String description;
@@ -45,20 +43,14 @@ public enum Skill {
      * Private constructor for Skill enum constants.
      * Called automatically by the enum declarations at the top.
      */
-    Skill(String displayName, int color, String description) {
+    Skill(String displayName, String description) {
         this.displayName = displayName;
-        this.colorHex = color;
         this.description = description;
     }
 
     /** Returns the skill's display name (e.g. "Fishing") */
     public String getDisplayName() {
         return displayName;
-    }
-
-    /** Returns the associated color for use in UI (e.g. scoreboards, bars, messages) */
-    public int getColorHex() {
-        return colorHex;
     }
 
     /** Returns a short description of the skill */

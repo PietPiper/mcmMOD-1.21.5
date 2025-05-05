@@ -11,21 +11,22 @@ public class PlayerSettings {
     //TODO: Add these to config for server wide toggle.
     public boolean showLevelUpMessages = true;
     public boolean enableActiveSkills = true;
-    //Add colors for each XP bar from Skill enumerated values;
-    public int fishingColor = ConfigManager.getConfig().defaultFishingColor;
-    public int tamingColor = ConfigManager.getConfig().defaultTamingColor;
-    public int miningColor = ConfigManager.getConfig().defaultMiningColor;
-    public int acrobaticsColor = ConfigManager.getConfig().defaultAcrobaticsColor;
-    public int woodcuttingColor = ConfigManager.getConfig().defaultWoodcuttingColor;
-    public int herbalismColor = ConfigManager.getConfig().defaultHerbalismColor;
-    public int excavationColor = ConfigManager.getConfig().defaultExcavationColor;
-    public int unarmedColor = ConfigManager.getConfig().defaultUnarmedColor;
-    public int archeryColor = ConfigManager.getConfig().defaultArcheryColor;
-    public int swordsColor = ConfigManager.getConfig().defaultSwordsColor;
-    public int axesColor = ConfigManager.getConfig().defaultAxesColor;
-    public int alchemyColor = ConfigManager.getConfig().defaultAlchemyColor;
-    public int smeltingColor = ConfigManager.getConfig().defaultSmeltingColor;
-    public int enchantingColor = ConfigManager.getConfig().defaultEnchantingColor;
-    public int glidingColor = ConfigManager.getConfig().defaultGlidingColor;
+    //Add colors for each XP bar from config values;
+    public int fishingColor = 0x00FFFF;
+    public int tamingColor = 0xFFAA00;
+    public int miningColor = 0xAAAAAA;
+    public int acrobaticsColor = 0xFFFFFF;
+    public int woodcuttingColor = 0x00AA00;
+    public int herbalismColor = 0x55FF55;
+    public int excavationColor = 0xFFFF55;
+    public int unarmedColor = 0xAA00AA;
+    public int archeryColor = 0xAA00AA;
+    public int swordsColor = 0xAA0000;
+    public int axesColor = 0x00AAAA;
+    public int alchemyColor = 0xFF55FF;
+    public int smeltingColor = 0x0000AA;
+    public int enchantingColor = 0x5555FF;
+    public int glidingColor = 0x000000;
+
     //Add other player specific settings here.
 }

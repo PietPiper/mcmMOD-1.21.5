@@ -192,7 +192,7 @@ public class DevCommandHandler {
             return 0;
         }
 
-        PlayerDataManager.setLevel(player.getUuid(), levelToSet, skill);
+        PlayerDataManager.updatePlayerExperience(player.getUuid(), skill, null, null, levelToSet);
         ctx.getSource().sendFeedback(
                 () -> Text.literal(player.getName().getString() + " " + skill.getDisplayName() + " level has been set to " + levelToSet + "."),
                 false
@@ -219,7 +219,7 @@ public class DevCommandHandler {
             return 0;
         }
 
-        PlayerDataManager.setXP(player.getUuid(), xpToSet, skill);
+        PlayerDataManager.updatePlayerExperience(player.getUuid(), skill, xpToSet, null, null);
         ctx.getSource().sendFeedback(
                 () -> Text.literal(player.getName().getString() + " " + skill.getDisplayName() + " XP has been set to " + xpToSet + "."),
                 false
@@ -246,7 +246,7 @@ public class DevCommandHandler {
             return 0;
         }
 
-        PlayerDataManager.setRemainingXP(player.getUuid(), remainingXPToSet, skill);
+        PlayerDataManager.updatePlayerExperience(player.getUuid(), skill, null, remainingXPToSet, null);
         ctx.getSource().sendFeedback(
                 () -> Text.literal(player.getName().getString() + " " + skill.getDisplayName() + " remaining XP has been set to " + remainingXPToSet + "."),
                 false
@@ -301,7 +301,7 @@ public class DevCommandHandler {
         }
 
         int curLvl = PlayerDataManager.getLevel(player.getUuid(), skill);
-        PlayerDataManager.setLevel(player.getUuid(), curLvl + lvlsToAdd, skill);
+        PlayerDataManager.updatePlayerExperience(player.getUuid(), skill, null, null, curLvl + lvlsToAdd);
         ctx.getSource().sendFeedback(
                 () -> Text.literal(lvlsToAdd + " levels have been added to " + player.getName().getString() + "'s " + skill.getDisplayName() + " skill."),
                 false
@@ -372,9 +372,7 @@ public class DevCommandHandler {
         UUID uuid = player.getUuid();
 
         for (Skill skill : Skill.values()) {
-            PlayerDataManager.setLevel(uuid, PlayerDataManager.STARTING_LEVEL, skill);
-            PlayerDataManager.setXP(uuid, PlayerDataManager.STARTING_XP, skill);
-            PlayerDataManager.setRemainingXP(uuid, PlayerDataManager.STARTING_REMAINING_XP, skill);
+            PlayerDataManager.updatePlayerExperience(uuid, skill, PlayerDataManager.STARTING_XP, PlayerDataManager.STARTING_REMAINING_XP, ConfigManager.getConfig().startingLevel);
         }
 
         ctx.getSource().sendFeedback(

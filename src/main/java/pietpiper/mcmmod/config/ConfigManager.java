@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class ConfigManager {
     private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().resolve("mcmmod.yml").toString());
-    private static McmmodConfig config;
+    private static McmmodConfig config = null;
 
     public static void load() {
         try {
@@ -69,6 +69,9 @@ public class ConfigManager {
 
         # Whether or not active skills are enabled on the server.
         enableActiveSkills: true
+        
+        # Level players start at for all skills.
+        startingLevel: 0
         
         # Whether each skill is enabled on the server.
         enableFishing: true

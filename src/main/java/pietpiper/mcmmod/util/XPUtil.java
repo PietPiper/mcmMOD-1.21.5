@@ -53,9 +53,7 @@ public class XPUtil {
         }
 
         // Update all values in the database
-        PlayerDataManager.setXP(uuid, xp, skill);
-        PlayerDataManager.setRemainingXP(uuid, remaining, skill);
-        PlayerDataManager.setLevel(uuid, level, skill);
+        PlayerDataManager.updatePlayerExperience(uuid, skill, xp, remaining, level);
 
         // Optionally, trigger future event hook here:
         // SkillEvents.LEVEL_UP.invoker().onLevelUp(player, skill, level);

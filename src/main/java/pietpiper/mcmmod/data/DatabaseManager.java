@@ -27,34 +27,46 @@ public class DatabaseManager {
      */
     public static void connect(MinecraftServer server) {
         try {
-            // Locate the path to the world save folder and create a database file inside it
-            Path dbPath = server.getSavePath(WorldSavePath.ROOT) // Store the DB inside the active world folder
+            // Resolve path to world directory
+            Path dbPath = server.getSavePath(WorldSavePath.ROOT)
                     .resolve("playerdata.db");
 
-            // Establish connection — assign to shared field, not a local shadow
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
 
             try (Statement stmt = connection.createStatement()) {
-                StringBuilder sql = new StringBuilder("""
-                    CREATE TABLE IF NOT EXISTS player_stats (
-                        uuid TEXT PRIMARY KEY
-                    """);
+                // Enable foreign key support
+                stmt.execute("PRAGMA foreign_keys = ON;");
 
-                // Dynamically add columns for each skill (xp, remaining_xp, level)
-                for (Skill skill : Skill.values()) {
-                    String name = skill.getDisplayName(); // e.g. "Fishing"
-                    sql.append(",\n")
-                            .append(name).append("_xp INTEGER NOT NULL")
-                            .append(",\n")
-                            .append(name).append("_remaining_xp INTEGER NOT NULL")
-                            .append(",\n")
-                            .append(name).append("_level INTEGER NOT NULL");
-                }
-                sql.append(",\n")
-                        .append("settings TEXT NOT NULL");
-                sql.append("\n);"); // Close the CREATE TABLE statement
+                // USERS TABLE
+                stmt.execute("""
+                            CREATE TABLE IF NOT EXISTS users (
+                                uuid TEXT PRIMARY KEY,
+                                settings TEXT NOT NULL
+                            );
+                        """);
 
-                stmt.executeUpdate(sql.toString());
+                // SKILLS TABLE
+                stmt.execute("""
+                            CREATE TABLE IF NOT EXISTS skills (
+                                skill_name TEXT PRIMARY KEY,
+                                color_hex INTEGER NOT NULL,
+                                description TEXT
+                            );
+                        """);
+
+                // PLAYER_SKILLS TABLE (join table)
+                stmt.execute("""
+                            CREATE TABLE IF NOT EXISTS player_skills (
+                                uuid TEXT NOT NULL,
+                                skill_name TEXT NOT NULL,
+                                xp INTEGER NOT NULL,
+                                remaining_xp INTEGER NOT NULL,
+                                level INTEGER NOT NULL,
+                                PRIMARY KEY (uuid, skill_name),
+                                FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE,
+                                FOREIGN KEY (skill_name) REFERENCES skills(skill_name) ON DELETE CASCADE
+                            );
+                        """);
             }
 
             System.out.println("[SQLite] Connected and initialized at: " + dbPath);
