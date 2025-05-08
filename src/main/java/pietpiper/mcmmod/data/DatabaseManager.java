@@ -6,10 +6,7 @@ import net.minecraft.util.WorldSavePath;
 import pietpiper.mcmmod.skill.Skill;
 
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * SQLiteManager handles connecting to and initializing the mod's persistent SQLite database.
@@ -49,7 +46,6 @@ public class DatabaseManager {
                 stmt.execute("""
                             CREATE TABLE IF NOT EXISTS skills (
                                 skill_name TEXT PRIMARY KEY,
-                                color_hex INTEGER NOT NULL,
                                 description TEXT
                             );
                         """);
@@ -67,6 +63,17 @@ public class DatabaseManager {
                                 FOREIGN KEY (skill_name) REFERENCES skills(skill_name) ON DELETE CASCADE
                             );
                         """);
+            }
+
+            for (Skill skill : Skill.values()) {
+                try (PreparedStatement ps = connection.prepareStatement("""
+                INSERT OR IGNORE INTO skills (skill_name, description)
+                VALUES (?, ?)
+                """)) {
+                    ps.setString(1, skill.getDisplayName());
+                    ps.setString(2, skill.getDescription());
+                    ps.executeUpdate();
+                }
             }
 
             System.out.println("[SQLite] Connected and initialized at: " + dbPath);

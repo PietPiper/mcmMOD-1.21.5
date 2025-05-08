@@ -4,7 +4,8 @@
 	"refmap": "mcmmod.refmap.json",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+		"ExampleMixin",
+		"FishingBobberMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
