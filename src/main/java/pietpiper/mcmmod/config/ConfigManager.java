@@ -90,7 +90,8 @@ public class ConfigManager {
         enableEnchanting: true
         enableGliding: true
         
-        
+        # Debug settings.
+        debugMode: false
         """;
 
         try (FileWriter writer = new FileWriter(CONFIG_FILE)) {

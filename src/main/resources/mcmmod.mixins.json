@@ -5,7 +5,10 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"ExampleMixin",
-		"FishingBobberMixin"
+		"FishingBobberMixin",
+		"IceFishingMixin",
+		"FishermansDietMixin",
+		"FishingBobberAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -5,6 +5,7 @@ package pietpiper.mcmmod.config;
 // Also update default values in Player Settings for individual settings like colors.
 public class McmmodConfig {
     public int startingLevel = 0;
+    public boolean debugMode = false;
     public boolean showXpBar = true;
     public boolean enableActiveSkills = true;
     public boolean enableFishing = true;

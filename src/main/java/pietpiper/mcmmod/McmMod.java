@@ -3,6 +3,7 @@ package pietpiper.mcmmod;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import pietpiper.mcmmod.config.ConfigManager;
 import pietpiper.mcmmod.config.SkillConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.data.DatabaseManager;
+import pietpiper.mcmmod.debug.FishingDebugManager;
 import pietpiper.mcmmod.skill.fishing.FishingLootManager;
 import pietpiper.mcmmod.skill.fishing.FishingSkill;
 import pietpiper.mcmmod.util.ServerReference;
@@ -55,6 +57,12 @@ public class McmMod implements ModInitializer {
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			DevCommandHandler.register(dispatcher);
+		});
+
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			if(ConfigManager.getConfig().debugMode) {
+				FishingDebugManager.tick(server);
+			}
 		});
 
 	}
