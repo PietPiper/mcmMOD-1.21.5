@@ -12,6 +12,7 @@ import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.mixin.FishingBobberAccessor;
 import pietpiper.mcmmod.skill.Skill;
 import pietpiper.mcmmod.config.SkillConfigManager;
+import pietpiper.mcmmod.skill.fishing.FishingLootManager;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -42,6 +43,7 @@ public class FishingDebugManager {
                 int level = PlayerDataManager.getLevel(player.getUuid(), Skill.FISHING);
                 int minBonus = SkillConfigManager.getTotalMinWaitReduction(level, player.hasVehicle());
                 int maxBonus = SkillConfigManager.getTotalMaxWaitReduction(level, player.hasVehicle());
+                int spotFished = FishingLootManager.getFishAtSpot(player);
 
                 String state = wait > 0 ? "WAITING" :
                         travel > 0 ? "TRAVELING" :
@@ -54,7 +56,8 @@ public class FishingDebugManager {
                         .append(Text.literal("\nfishTravelCountdown: " + travel).formatted(Formatting.GOLD))
                         .append(Text.literal("\nhookCountdown: " + hook).formatted(Formatting.BLUE))
                         .append(Text.literal("\nPlayer Level: " + level).formatted(Formatting.GREEN))
-                        .append(Text.literal("\nMasterAngler: -" + minBonus + " to -" + maxBonus).formatted(Formatting.LIGHT_PURPLE));
+                        .append(Text.literal("\nMasterAngler: -" + minBonus + " to -" + maxBonus).formatted(Formatting.LIGHT_PURPLE))
+                        .append(Text.literal("\nFishingSpotCount: " + spotFished).formatted(Formatting.DARK_GREEN));
 
                 display.setText(text);
                 display.setPosition(bobber.getPos().add(0, 1.5, 0));

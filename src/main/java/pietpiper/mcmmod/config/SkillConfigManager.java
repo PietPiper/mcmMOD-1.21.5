@@ -6,14 +6,18 @@ import pietpiper.mcmmod.util.ServerReference;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class SkillConfigManager {
-    private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().resolve("skill_config.yml").toString());
+    private static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("MCMMOD");
+    private static final File CONFIG_FILE = CONFIG_DIR.resolve("skill_config.yml").toFile();
+    private static final File DEFAULT_FILE = CONFIG_DIR.resolve("defaults/skill_config_defaults.yml").toFile();
     private static final TreeMap<Integer, String> fishingTreasureTiers = new TreeMap<>();
     private static final TreeMap<Integer, FishermansDietBonus> fishermansDietTiers = new TreeMap<>();
     private static final TreeMap<Integer, MasterAnglerBonus> masterAnglerRanks = new TreeMap<>();
@@ -21,6 +25,8 @@ public class SkillConfigManager {
     private static int iceFishingLevel = 0;
     private static int boatBonusMinTicks = 0;
     private static int boatBonusMaxTicks = 0;
+    private static int maxFishPerSpot = 0;
+    private static int minFishingSpotDistance = 0;
 
     public static void load() {
         if (!CONFIG_FILE.exists()) {
@@ -66,6 +72,9 @@ public class SkillConfigManager {
 
             boatBonusMinTicks = (int) fishing.getOrDefault("BoatBonusReductionMinTicks", 0);
             boatBonusMaxTicks = (int) fishing.getOrDefault("BoatBonusReductionMaxTicks", 0);
+
+            maxFishPerSpot = ((Number) fishing.getOrDefault("Max_Fish_Per_Spot", 9)).intValue();
+            minFishingSpotDistance = ((Number) fishing.getOrDefault("New_Spot_Distance", 3)).intValue();
 
             // Load Magic Hunter tier level requirements
             magicHunterTiers.clear();
@@ -122,7 +131,7 @@ public class SkillConfigManager {
     }
 
     private static void saveDefault() {
-        String yaml = """
+        String defaultYaml = """
             # The settings for the fishing subskill unlock requirements and customization.
             Fishing:
             
@@ -229,14 +238,36 @@ public class SkillConfigManager {
               # The additional reduction a player gets when sitting in a boat.
               BoatBonusReductionMinTicks: 2
               BoatBonusReductionMaxTicks: 4
+            
+              # The settings for afk fishing prevention.
+              Max_Fish_Per_Spot: 9
+              New_Spot_Distance: 3
             """;
 
-        try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-            writer.write(yaml);
-            System.out.println("Default skill_config.yml created.");
-        } catch (Exception e) {
+        try {
+            if (!CONFIG_DIR.toFile().exists()) CONFIG_DIR.toFile().mkdirs();
+            if (!DEFAULT_FILE.getParentFile().exists()) DEFAULT_FILE.getParentFile().mkdirs();
+
+            try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
+                writer.write(defaultYaml);
+                System.out.println("skill_config.yml created.");
+            }
+
+            try (FileWriter writer = new FileWriter(DEFAULT_FILE)) {
+                writer.write(defaultYaml);
+                System.out.println("skill_config_default.yml created.");
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static int getMaxFishPerSpot() {
+        return maxFishPerSpot;
+    }
+
+    public static int getMinFishingSpotDistance() {
+        return minFishingSpotDistance;
     }
 
     public static class FishermansDietBonus {

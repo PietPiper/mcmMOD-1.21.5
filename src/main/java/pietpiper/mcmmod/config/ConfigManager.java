@@ -10,12 +10,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
 public class ConfigManager {
-    private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().resolve("mcmmod.yml").toString());
+    private static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("MCMMOD");
+    private static final File CONFIG_FILE = CONFIG_DIR.resolve("mcmmod.yml").toFile();
+    private static final File DEFAULT_FILE = CONFIG_DIR.resolve("defaults/mcmmod_defaults.yml").toFile();
+
     private static McmmodConfig config = null;
 
     public static void load() {
@@ -60,19 +63,19 @@ public class ConfigManager {
         defaultGlidingColor: 0x000000
 
         #==== Global Server Settings ====
-        
+
         # Maximum skill level players can reach
         maxLevel: 10000
-        
+
         # Whether the XP bar is shown to players. (TODO: Add for individual skills)
         showXpBar: true
 
         # Whether or not active skills are enabled on the server.
         enableActiveSkills: true
-        
+
         # Level players start at for all skills.
         startingLevel: 0
-        
+
         # Whether each skill is enabled on the server.
         enableFishing: true
         enableTaming: true
@@ -89,13 +92,22 @@ public class ConfigManager {
         enableSmelting: true
         enableEnchanting: true
         enableGliding: true
-        
+
         # Debug settings.
         debugMode: false
         """;
 
-        try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-            writer.write(defaultYaml);
+        try {
+            if (!CONFIG_DIR.toFile().exists()) CONFIG_DIR.toFile().mkdirs();
+            if (!DEFAULT_FILE.getParentFile().exists()) DEFAULT_FILE.getParentFile().mkdirs();
+
+            try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
+                writer.write(defaultYaml);
+            }
+
+            try (FileWriter writer = new FileWriter(DEFAULT_FILE)) {
+                writer.write(defaultYaml);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,3 +117,4 @@ public class ConfigManager {
         return config;
     }
 }
+

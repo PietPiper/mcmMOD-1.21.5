@@ -18,10 +18,10 @@ public class XPUtil {
      * @return XP needed to level up
      */
     public static int getXPRequiredForLevelUp(int level) {
-        if (level <= 2000) {
+        if (level <= 1000) {
             return 20 * level + 1020;
         } else {
-            return 5 * level + 31020;
+            return 5 * (level - 1000) + 21020;
         }
     }
 
@@ -69,22 +69,14 @@ public class XPUtil {
      * @return The total XP required from level 0 to get to the specified level
      */
     public static int getTotalXPToReachLevel(int level) {
-        if (level <= 2000) {
+        if (level <= 1000) {
             // For level <= 2000, use the standard XP curve: 10x(101 + x)
             return 10 * level * (101 + level);
         } else {
-            // Precomputed XP required to reach level 2000
-            int f2000 = 10 * 2000 * (101 + 2000);
-
-            // Quadratic XP scaling after level 2000 (carryover curve)
-            // Derived from: 5 * ((x - 1)x - (2000 * 1999)) / 2
-            int quad = (((level - 1) * level) - (2000 * 1999)) / 2;
-
-            // Linear component for the tail of the XP curve
-            int linear = 31020 * (level - 2000);
-
-            // Final lifetime XP required for level > 2000
-            return f2000 + 5 * quad + linear;
+            int f1000 = 10 * 1000 * (101 + 1000); // T(1000)
+            int n = level - 1000;
+            int tail = n * (2 * 21020 + (n - 1) * 5) / 2;
+            return f1000 + tail;
         }
     }
 

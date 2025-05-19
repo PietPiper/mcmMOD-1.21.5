@@ -5,7 +5,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import org.yaml.snakeyaml.Yaml;
 import pietpiper.mcmmod.config.SkillConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
@@ -18,10 +20,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FishingLootManager {
-    private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().resolve("fishing_treasure_config.yml").toString());
+    //private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().resolve("fishing_treasure_config.yml").toString());
+
+    private static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("MCMMOD");
+    private static final File CONFIG_FILE = CONFIG_DIR.resolve("fishing_treasure_config.yml").toFile();
+    private static final File DEFAULT_FILE = CONFIG_DIR.resolve("defaults/fishing_treasure_config_defaults.yml").toFile();
 
     private static final Map<String, LootEntry> allLootEntries = new HashMap<>();
     private static final TreeMap<String, Map<String, Double>> tierDropRates = new TreeMap<>();
@@ -30,6 +38,7 @@ public class FishingLootManager {
     private static final TreeMap<String, Map<String, Double>> enchantmentDropRatesByTier = new TreeMap<>();
     private static final Map<String, Integer> enchantXpByRarity = new HashMap<>();
     private static boolean xpPerEnchant = false;
+    private static final Map<UUID, FishingSpotData> fishingSpotMap = new ConcurrentHashMap<>();
 
     public static void loadConfig() {
         if (!CONFIG_FILE.exists()) {
@@ -423,15 +432,52 @@ Magic_Find_EnchantXP:
   XPPerEnchant: true
 """;
 
-        try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-            writer.write(defaultYaml);
-            ServerReference.logConsole("Default fishing loot config created at: " + CONFIG_FILE);
+        try {
+            if (!CONFIG_DIR.toFile().exists()) CONFIG_DIR.toFile().mkdirs();
+            if (!DEFAULT_FILE.getParentFile().exists()) DEFAULT_FILE.getParentFile().mkdirs();
+
+            try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
+                writer.write(defaultYaml);
+                //ServerReference.logConsole("Default fishing loot config created at: " + CONFIG_FILE);
+            }
+
+            try (FileWriter writer = new FileWriter(DEFAULT_FILE)) {
+                writer.write(defaultYaml);
+                //ServerReference.logConsole("Default fishing loot config created at: " + DEFAULT_FILE);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static ItemStack getLootForPlayer(ServerPlayerEntity player) {
+    public static ItemStack getLootForPlayer(ServerPlayerEntity player, BlockPos bobberPos) {
+        UUID playerId = player.getUuid();
+        FishingSpotData data = fishingSpotMap.get(playerId);
+        int distFromSpot = SkillConfigManager.getMinFishingSpotDistance();
+        //int distFromSpot = 3;
+        int distSquared = distFromSpot * distFromSpot;
+        //int distSquared = 3 * 3;
+        int maxFish = SkillConfigManager.getMaxFishPerSpot();
+        //int maxFish = 9;
+
+        if (data == null) {
+            fishingSpotMap.put(playerId, new FishingSpotData(bobberPos, 1));
+        } else {
+            if (data.bobberPos.getSquaredDistance(bobberPos) <= distSquared) {
+                data.count++;
+            } else {
+                data.bobberPos = bobberPos;
+                data.count = 1;
+            }
+
+            if (data.count == maxFish) {
+                player.sendMessage(Text.of("§eThis fishing spot is starting to dry up... try a new one soon."), false);
+            } else if (data.count > maxFish) {
+                player.sendMessage(Text.of("§cThis spot seems empty. Try fishing somewhere else."), false);
+                return ItemStack.EMPTY;
+            }
+        }
+
         int level = PlayerDataManager.getLevel(player.getUuid(), Skill.FISHING);
         String tier = SkillConfigManager.getFishingTier(level);
 
@@ -442,11 +488,6 @@ Magic_Find_EnchantXP:
         Map<String, Double> tierRates = tierDropRates.getOrDefault(tier, Map.of());
         double totalTreasureChance = tierRates.values().stream().mapToDouble(Double::doubleValue).sum();
         double roll = new Random().nextDouble();
-
-        System.out.println("[FishingLootManager] Level: " + level);
-        System.out.println("[FishingLootManager] Tier: " + tier);
-        System.out.println("[FishingLootManager] Tier rates: " + tierRates);
-        System.out.println("[FishingLootManager] Total treasure chance: " + totalTreasureChance);
 
         if (roll < totalTreasureChance / 100.0) {
             double tierRoll = new Random().nextDouble() * totalTreasureChance;
@@ -466,7 +507,6 @@ Magic_Find_EnchantXP:
                 }
             }
         }
-
         return getNonTreasureLoot(player);
     }
 
@@ -505,6 +545,11 @@ Magic_Find_EnchantXP:
         return tierMap.getOrDefault("ExtraEnchantChance", 0.0);
     }
 
+    public static int getFishAtSpot(ServerPlayerEntity player) {
+        FishingSpotData spotFished = fishingSpotMap.get(player.getUuid());
+        return (spotFished != null) ? spotFished.count : 0;
+    }
+
     private static class LootEntry {
         public final Item item;
         public final int amount;
@@ -516,6 +561,16 @@ Magic_Find_EnchantXP:
             this.amount = amount;
             this.xp = xp;
             this.rarity = rarity;
+        }
+    }
+
+    private static class FishingSpotData {
+        BlockPos bobberPos;
+        int count;
+
+        FishingSpotData(BlockPos pos, int count) {
+            this.bobberPos = pos;
+            this.count = count;
         }
     }
 }

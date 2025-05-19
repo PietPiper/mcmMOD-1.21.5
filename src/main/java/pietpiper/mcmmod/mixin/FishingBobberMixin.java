@@ -43,7 +43,7 @@ public abstract class FishingBobberMixin {
             // FishingSkill.onGainXp(serverPlayer, bobber);
 
             // Generate treasure item based on level (adjust as needed)
-            ItemStack treasure = FishingLootManager.getLootForPlayer(serverPlayer);
+            ItemStack treasure = FishingLootManager.getLootForPlayer(serverPlayer, bobber.getBlockPos());
             // Run through Magic Find logic
             if (!treasure.isEmpty()) {
                 MagicFindManager.tryApplyMagicFind(treasure, serverPlayer);
