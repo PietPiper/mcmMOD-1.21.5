@@ -1,6 +1,8 @@
 package pietpiper.mcmmod.mixin;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
@@ -10,6 +12,7 @@ import net.minecraft.loot.context.LootWorldContext;
 import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -87,6 +90,20 @@ public abstract class FishingBobberMixin {
             int reduction = minReduction + bobber.getRandom().nextInt(maxReduction - minReduction + 1);
             this.waitCountdown = Math.max(20, this.waitCountdown - reduction);
 
+        }
+    }
+    @Inject(
+            method = "pullHookedEntity",
+            at = @At("HEAD")
+    )
+    private void onShake(Entity entity, CallbackInfo ci) {
+        if (!(entity instanceof LivingEntity)) return;
+
+        Entity owner = ((FishingBobberEntity) (Object) this).getOwner();
+        if (owner instanceof ServerPlayerEntity player) {
+            int level = PlayerDataManager.getLevel(player.getUuid(), Skill.FISHING);
+            double shakeChance = SkillConfigManager.getShakeChance(level);
+            player.sendMessage(Text.literal(owner.getName() + "Shake Chance: " + String.format("%.1f", shakeChance * 100) + "%"), false);
         }
     }
 

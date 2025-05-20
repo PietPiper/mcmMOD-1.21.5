@@ -27,6 +27,10 @@ public class SkillConfigManager {
     private static int boatBonusMaxTicks = 0;
     private static int maxFishPerSpot = 0;
     private static int minFishingSpotDistance = 0;
+    private static double minShakeChance = 0;
+    private static double maxShakeChance = 0;
+    private static int shakeUnlockLevel = 0;
+    private static int maxShakeLevel = 0;
 
     public static void load() {
         if (!CONFIG_FILE.exists()) {
@@ -76,6 +80,11 @@ public class SkillConfigManager {
             maxFishPerSpot = ((Number) fishing.getOrDefault("Max_Fish_Per_Spot", 9)).intValue();
             minFishingSpotDistance = ((Number) fishing.getOrDefault("New_Spot_Distance", 3)).intValue();
 
+            minShakeChance = ((Number) fishing.getOrDefault("Min_Shake_Chance", 0)).doubleValue() / 100;
+            maxShakeChance = ((Number) fishing.getOrDefault("Max_Shake_Chance", 100)).doubleValue() / 100;
+            shakeUnlockLevel = ((Number) fishing.getOrDefault("Min_Shake_Chance_Level", 0)).intValue();
+            maxShakeLevel = ((Number) fishing.getOrDefault("Max_Shake_Chance_Level", 1000)).intValue();
+
             // Load Magic Hunter tier level requirements
             magicHunterTiers.clear();
             if (fishing.containsKey("MagicHunterTiers")) {
@@ -91,6 +100,18 @@ public class SkillConfigManager {
             ServerReference.logConsole("Error loading skill_config.yml");
             e.printStackTrace();
         }
+    }
+
+    public static double getShakeChance(int level) {
+        if(level < shakeUnlockLevel) {
+            return 0.0;
+        }
+        if(level >= maxShakeLevel) {
+            return maxShakeChance;
+        }
+
+        double progress = (double) (level - shakeUnlockLevel) / (maxShakeLevel - shakeUnlockLevel);
+        return minShakeChance + (maxShakeChance - minShakeChance) * progress;
     }
 
     public static String getMagicHunterTier(int level) {
@@ -242,6 +263,12 @@ public class SkillConfigManager {
               # The settings for afk fishing prevention.
               Max_Fish_Per_Spot: 9
               New_Spot_Distance: 3
+            
+              # Shake settings.
+              Min_Shake_chance: 10
+              Max_Shake_Chance: 60
+              Shake_Unlock_Level: 0
+              Max_Shake_Level: 100
             """;
 
         try {
