@@ -82,8 +82,8 @@ public class SkillConfigManager {
 
             minShakeChance = ((Number) fishing.getOrDefault("Min_Shake_Chance", 0)).doubleValue() / 100;
             maxShakeChance = ((Number) fishing.getOrDefault("Max_Shake_Chance", 100)).doubleValue() / 100;
-            shakeUnlockLevel = ((Number) fishing.getOrDefault("Min_Shake_Chance_Level", 0)).intValue();
-            maxShakeLevel = ((Number) fishing.getOrDefault("Max_Shake_Chance_Level", 1000)).intValue();
+            shakeUnlockLevel = ((Number) fishing.getOrDefault("Shake_Unlock_Level", 0)).intValue();
+            maxShakeLevel = ((Number) fishing.getOrDefault("Max_Shake_Level", 1000)).intValue();
 
             // Load Magic Hunter tier level requirements
             magicHunterTiers.clear();
@@ -103,10 +103,10 @@ public class SkillConfigManager {
     }
 
     public static double getShakeChance(int level) {
-        if(level < shakeUnlockLevel) {
+        if (level < shakeUnlockLevel) {
             return 0.0;
         }
-        if(level >= maxShakeLevel) {
+        if (level >= maxShakeLevel) {
             return maxShakeChance;
         }
 
@@ -265,10 +265,10 @@ public class SkillConfigManager {
               New_Spot_Distance: 3
             
               # Shake settings.
-              Min_Shake_chance: 10
-              Max_Shake_Chance: 60
+              Min_Shake_Chance: 0
+              Max_Shake_Chance: 100
               Shake_Unlock_Level: 0
-              Max_Shake_Level: 100
+              Max_Shake_Level: 1000
             """;
 
         try {

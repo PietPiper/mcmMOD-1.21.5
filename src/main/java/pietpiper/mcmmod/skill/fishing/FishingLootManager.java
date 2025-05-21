@@ -1,6 +1,7 @@
 package pietpiper.mcmmod.skill.fishing;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -39,6 +40,7 @@ public class FishingLootManager {
     private static final Map<String, Integer> enchantXpByRarity = new HashMap<>();
     private static boolean xpPerEnchant = false;
     private static final Map<UUID, FishingSpotData> fishingSpotMap = new ConcurrentHashMap<>();
+    private static final Map<String, List<ShakeDrop>> shakeDropTables = new HashMap<>();
 
     public static void loadConfig() {
         if (!CONFIG_FILE.exists()) {
@@ -63,6 +65,25 @@ public class FishingLootManager {
                 int xp = ((Number) props.getOrDefault("XP", 0)).intValue();
                 String rarity = ((String) props.getOrDefault("Rarity", "COMMON")).toUpperCase();
                 allLootEntries.put(itemId, new LootEntry(item, amount, xp, rarity));
+            }
+
+            //Load shake drops
+            if (root.containsKey("Shake_Drops")) {
+                Map<String, List<Map<String, Object>>> shakeSection = (Map<String, List<Map<String, Object>>>) root.get("Shake_Drops");
+                for (Map.Entry<String, List<Map<String, Object>>> entry : shakeSection.entrySet()) {
+                    String entityId = entry.getKey();
+                    List<Map<String, Object>> dropList = entry.getValue();
+                    List<ShakeDrop> drops = new ArrayList<>();
+                    for (Map<String, Object> drop : dropList) {
+                        Identifier itemId = Identifier.tryParse((String) drop.get("Item"));
+                        if (itemId == null || !Registries.ITEM.containsId(itemId)) continue;
+                        int min = ((Number) drop.getOrDefault("Min", 1)).intValue();
+                        int max = ((Number) drop.getOrDefault("Max", 1)).intValue();
+                        double chance = ((Number) drop.getOrDefault("Chance", 100)).doubleValue();
+                        drops.add(new ShakeDrop(itemId, min, max, chance));
+                    }
+                    shakeDropTables.put(entityId, drops);
+                }
             }
 
             // Load DropRates
@@ -430,6 +451,18 @@ Magic_Find_EnchantXP:
   MYTHIC: 50
   CURSES: 25
   XPPerEnchant: true
+  
+Shake_Drops:
+  minecraft:zombie:
+    - Item: minecraft:rotten_flesh
+      Min: 1
+      Max: 3
+      Chance: 100
+  minecraft:creeper:
+    - Item: minecraft:gunpowder
+      Min: 1
+      Max: 2
+      Chance: 50
 """;
 
         try {
@@ -447,6 +480,22 @@ Magic_Find_EnchantXP:
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void handleShakeDrops(LivingEntity target, ServerPlayerEntity player) {
+        String entityId = Registries.ENTITY_TYPE.getId(target.getType()).toString();
+        List<ShakeDrop> drops = shakeDropTables.getOrDefault(entityId, List.of());
+        Random random = new Random();
+
+        for (ShakeDrop drop : drops) {
+            if (random.nextDouble() * 100 <= drop.chance) {
+                int count = drop.min + random.nextInt(drop.max - drop.min + 1);
+                ItemStack stack = new ItemStack(Registries.ITEM.get(drop.itemId), count);
+                if (!player.getInventory().insertStack(stack)) {
+                    player.dropItem(stack, false);
+                }
+            }
         }
     }
 
@@ -571,6 +620,20 @@ Magic_Find_EnchantXP:
         FishingSpotData(BlockPos pos, int count) {
             this.bobberPos = pos;
             this.count = count;
+        }
+    }
+
+    private static class ShakeDrop {
+        public final Identifier itemId;
+        public final int min;
+        public final int max;
+        public final double chance;
+
+        public ShakeDrop(Identifier itemId, int min, int max, double chance) {
+            this.itemId = itemId;
+            this.min = min;
+            this.max = max;
+            this.chance = chance;
         }
     }
 }

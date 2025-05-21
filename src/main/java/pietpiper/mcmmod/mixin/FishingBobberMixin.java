@@ -97,13 +97,19 @@ public abstract class FishingBobberMixin {
             at = @At("HEAD")
     )
     private void onShake(Entity entity, CallbackInfo ci) {
-        if (!(entity instanceof LivingEntity)) return;
+        if (!(entity instanceof LivingEntity living)) return;
 
         Entity owner = ((FishingBobberEntity) (Object) this).getOwner();
         if (owner instanceof ServerPlayerEntity player) {
             int level = PlayerDataManager.getLevel(player.getUuid(), Skill.FISHING);
             double shakeChance = SkillConfigManager.getShakeChance(level);
-            player.sendMessage(Text.literal(owner.getName() + "Shake Chance: " + String.format("%.1f", shakeChance * 100) + "%"), false);
+
+            // Optional debug message
+            player.sendMessage(Text.literal("Shake Chance: " + String.format("%.1f", shakeChance * 100) + "%"), false);
+
+            if (player.getRandom().nextDouble() < shakeChance) {
+                FishingLootManager.handleShakeDrops(living, player);
+            }
         }
     }
 
