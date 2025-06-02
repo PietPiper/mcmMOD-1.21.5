@@ -31,6 +31,9 @@ public class SkillConfigManager {
     private static double maxShakeChance = 0;
     private static int shakeUnlockLevel = 0;
     private static int maxShakeLevel = 0;
+    private static double shakeDamagePercent = 0;
+    private static float maxShakeDamage = 0;
+    private static int riverBiomeBonus = 0;
 
     public static void load() {
         if (!CONFIG_FILE.exists()) {
@@ -77,6 +80,9 @@ public class SkillConfigManager {
             boatBonusMinTicks = (int) fishing.getOrDefault("BoatBonusReductionMinTicks", 0);
             boatBonusMaxTicks = (int) fishing.getOrDefault("BoatBonusReductionMaxTicks", 0);
 
+            riverBiomeBonus = (int) fishing.getOrDefault("RiverBiomeBonus", 0);
+            System.out.println("River biome bonus: " + riverBiomeBonus);
+
             maxFishPerSpot = ((Number) fishing.getOrDefault("Max_Fish_Per_Spot", 9)).intValue();
             minFishingSpotDistance = ((Number) fishing.getOrDefault("New_Spot_Distance", 3)).intValue();
 
@@ -84,6 +90,8 @@ public class SkillConfigManager {
             maxShakeChance = ((Number) fishing.getOrDefault("Max_Shake_Chance", 100)).doubleValue() / 100;
             shakeUnlockLevel = ((Number) fishing.getOrDefault("Shake_Unlock_Level", 0)).intValue();
             maxShakeLevel = ((Number) fishing.getOrDefault("Max_Shake_Level", 1000)).intValue();
+            shakeDamagePercent = ((Number) fishing.getOrDefault("ShakeDamagePercent", 0.05)).doubleValue();
+            maxShakeDamage = ((Number) fishing.getOrDefault("MaxShakeDamage", 0)).floatValue();
 
             // Load Magic Hunter tier level requirements
             magicHunterTiers.clear();
@@ -128,6 +136,14 @@ public class SkillConfigManager {
         return iceFishingLevel;
     }
 
+    public static double getShakeDamagePercent() {
+        return shakeDamagePercent;
+    }
+
+    public static float getMaxShakeDamage() {
+        return maxShakeDamage;
+    }
+
     public static FishermansDietBonus getFishermansDietBonus(int level) {
         Map.Entry<Integer, FishermansDietBonus> entry = fishermansDietTiers.floorEntry(level);
         return entry != null ? entry.getValue() : new FishermansDietBonus(0, 0);
@@ -149,6 +165,10 @@ public class SkillConfigManager {
                 .sum();
         if (inBoat) reduction += boatBonusMaxTicks;
         return reduction;
+    }
+
+    public static int getRiverBiomeBonus() {
+        return riverBiomeBonus;
     }
 
     private static void saveDefault() {
@@ -260,6 +280,9 @@ public class SkillConfigManager {
               BoatBonusReductionMinTicks: 2
               BoatBonusReductionMaxTicks: 4
             
+              # The additional % wait reduction when the player is fishing in a river biome.
+              RiverBiomeBonus: 20
+            
               # The settings for afk fishing prevention.
               Max_Fish_Per_Spot: 9
               New_Spot_Distance: 3
@@ -269,6 +292,10 @@ public class SkillConfigManager {
               Max_Shake_Chance: 100
               Shake_Unlock_Level: 0
               Max_Shake_Level: 1000
+            
+              # Shake damage settings:
+              ShakeDamagePercent: 0.5
+              MaxShakeDamage: 4.0
             """;
 
         try {

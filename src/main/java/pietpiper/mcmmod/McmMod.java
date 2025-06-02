@@ -52,7 +52,7 @@ public class McmMod implements ModInitializer {
 			//Initialize the player.
 			PlayerDataManager.initPlayer(uuid);
 
-			ServerReference.broadcast("Initialized player data for " + player.getName());
+			ServerReference.logConsole("Initialized player data for " + player.getName());
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

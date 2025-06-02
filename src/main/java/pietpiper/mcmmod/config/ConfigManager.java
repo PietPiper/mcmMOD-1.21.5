@@ -94,7 +94,7 @@ public class ConfigManager {
         enableGliding: true
 
         # Debug settings.
-        debugMode: false
+        debugMode: true
         """;
 
         try {

@@ -1,6 +1,7 @@
 package pietpiper.mcmmod.mixin;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.fabricmc.fabric.impl.datagen.loot.ConditionBlockLootTableGenerator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,9 +12,16 @@ import net.minecraft.loot.LootTable;
 import net.minecraft.loot.context.LootWorldContext;
 import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,11 +29,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import pietpiper.mcmmod.config.ConfigManager;
 import pietpiper.mcmmod.config.SkillConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.skill.Skill;
 import pietpiper.mcmmod.skill.fishing.FishingLootManager;
 import pietpiper.mcmmod.skill.fishing.MagicFindManager;
+import pietpiper.mcmmod.util.ServerReference;
 
 @Mixin(FishingBobberEntity.class)
 public abstract class FishingBobberMixin {
@@ -50,6 +60,10 @@ public abstract class FishingBobberMixin {
             // Run through Magic Find logic
             if (!treasure.isEmpty()) {
                 MagicFindManager.tryApplyMagicFind(treasure, serverPlayer);
+            }
+            //Increase stat anyway even if they didn't catch an actual fish.
+            if (!treasure.isIn(ItemTags.FISHES)) {
+                serverPlayer.increaseStat(Stats.FISH_CAUGHT, 1);
             }
             return ObjectArrayList.of(treasure); // Replace vanilla loot with just this item
         }
@@ -87,8 +101,26 @@ public abstract class FishingBobberMixin {
                 maxReduction = temp;
             }
 
+            double riverFishingBonus = 0;
+            BlockPos bobberPos = bobber.getBlockPos();
+            RegistryEntry<Biome> biomeEntry = player.getWorld().getBiome(bobberPos);
+            Identifier biomeId = player.getWorld().getRegistryManager()
+                    .getOrThrow(RegistryKeys.BIOME)
+                    .getId(biomeEntry.value());
+            // Check if the biome is a river biome (using the default Minecraft ID)
+            if (biomeId.equals(BiomeKeys.RIVER.getValue())) {
+                ServerReference.logConsole("You are in a river biome!");
+                riverFishingBonus = SkillConfigManager.getRiverBiomeBonus();
+            } else {
+                ServerReference.logConsole("Not a river biome. Current biome: " + biomeId);
+            }
+
             int reduction = minReduction + bobber.getRandom().nextInt(maxReduction - minReduction + 1);
-            this.waitCountdown = Math.max(20, this.waitCountdown - reduction);
+            if(ConfigManager.getConfig().debugMode) {
+                ServerReference.logConsole("River bonus % : " + riverFishingBonus);
+                ServerReference.logConsole("Because you are fishing in a river biome " + (this.waitCountdown - reduction) * (1 - riverFishingBonus/100.0) + " is your new cooldown instead of " + (this.waitCountdown - reduction));
+            }
+            this.waitCountdown = Math.max(20, (int) ((this.waitCountdown - reduction) * ( 1 - riverFishingBonus )));
 
         }
     }
@@ -105,9 +137,10 @@ public abstract class FishingBobberMixin {
             double shakeChance = SkillConfigManager.getShakeChance(level);
 
             // Optional debug message
-            player.sendMessage(Text.literal("Shake Chance: " + String.format("%.1f", shakeChance * 100) + "%"), false);
+            ServerReference.logConsole("Shake Chance: " + String.format("%.1f", shakeChance * 100) + "%");
 
             if (player.getRandom().nextDouble() < shakeChance) {
+                ServerReference.logConsole("Getting loot for the shake.");
                 FishingLootManager.handleShakeDrops(living, player);
             }
         }

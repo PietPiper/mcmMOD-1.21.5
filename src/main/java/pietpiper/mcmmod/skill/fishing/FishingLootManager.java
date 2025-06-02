@@ -1,14 +1,27 @@
 package pietpiper.mcmmod.skill.fishing;
 
+import net.fabricmc.fabric.api.item.v1.FabricComponentMapBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.component.*;
+import net.minecraft.component.type.ProfileComponent;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.item.*;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.predicate.component.ComponentsPredicate;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import org.apache.logging.log4j.core.config.builder.api.ComponentBuilder;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 import pietpiper.mcmmod.config.SkillConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
@@ -24,6 +37,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.ItemEntity;
+import com.mojang.authlib.GameProfile;
+
+import net.minecraft.component.ComponentsAccess;
 
 public class FishingLootManager {
     //private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().resolve("fishing_treasure_config.yml").toString());
@@ -85,6 +109,7 @@ public class FishingLootManager {
                     shakeDropTables.put(entityId, drops);
                 }
             }
+
 
             // Load DropRates
             Map<String, Object> dropRatesSection = (Map<String, Object>) root.get("DropRates");
@@ -463,6 +488,11 @@ Shake_Drops:
       Min: 1
       Max: 2
       Chance: 50
+  minecraft:player:
+    - Item: minecraft:player_head
+      Min: 1
+      Max: 1
+      Chance: 20
 """;
 
         try {
@@ -484,19 +514,66 @@ Shake_Drops:
     }
 
     public static void handleShakeDrops(LivingEntity target, ServerPlayerEntity player) {
-        String entityId = Registries.ENTITY_TYPE.getId(target.getType()).toString();
-        List<ShakeDrop> drops = shakeDropTables.getOrDefault(entityId, List.of());
-        Random random = new Random();
+        //player.sendMessage(Text.literal("§aYou just shook that poor motherfucker"), false);
+        String id = Registries.ENTITY_TYPE.getId(target.getType()).toString();
+        if (target instanceof ServerPlayerEntity) {
+            id = "minecraft:player";  // Use the key for player drops
+        }
 
+        List<ShakeDrop> drops = shakeDropTables.getOrDefault(id, List.of());
+        if (drops.isEmpty()){
+            player.sendMessage(Text.literal("§aNo shake drops for that mob."), false);
+            return;
+        }
+
+        double roll = player.getRandom().nextDouble() * 100;
+        ShakeDrop selected = null;
         for (ShakeDrop drop : drops) {
-            if (random.nextDouble() * 100 <= drop.chance) {
-                int count = drop.min + random.nextInt(drop.max - drop.min + 1);
-                ItemStack stack = new ItemStack(Registries.ITEM.get(drop.itemId), count);
-                if (!player.getInventory().insertStack(stack)) {
-                    player.dropItem(stack, false);
-                }
+            if (roll < drop.chance) {
+                selected = drop;
+                break;
             }
         }
+
+        if (selected == null) {
+            player.sendMessage(Text.literal("§aYour shake drop was null :("), false);
+            return;
+        }
+
+        // Apply damage to the entity
+        float damage = Math.min((float)(target.getMaxHealth() * SkillConfigManager.getShakeDamagePercent()), SkillConfigManager.getMaxShakeDamage());
+        DamageSource source = target.getDamageSources().generic();
+        ServerWorld world = (ServerWorld) target.getWorld();
+        target.damage(world, source, damage);
+
+        ItemStack stack;
+        if (selected.itemId.equals(Items.PLAYER_HEAD.getRegistryEntry().registryKey().getValue()) && target instanceof ServerPlayerEntity targetPlayer) {
+            //Code im memorium for what I worked towards for hours and was actually pretty close just needed to be profileComponent.
+            /*stack = new ItemStack(Items.PLAYER_HEAD, 1);
+            Identifier compId = Identifier.tryParse("minecraft:profile");
+            ComponentType<GameProfile> skullOwnerType = (ComponentType<GameProfile>) Registries.DATA_COMPONENT_TYPE.get(compId);
+            stack.set(skullOwnerType, targetPlayer.getGameProfile());*/
+            stack = new ItemStack(Items.PLAYER_HEAD, 1);
+            GameProfile profile = player.getGameProfile();
+            ProfileComponent profileComponent = new ProfileComponent(profile);
+            stack.set(DataComponentTypes.PROFILE, profileComponent);
+        } else {
+            Item item = Registries.ITEM.get(selected.itemId);
+            int count = selected.min + (selected.max > selected.min ? player.getRandom().nextInt(selected.max - selected.min + 1) : 0);
+            stack = new ItemStack(item, count);
+
+        }
+
+        //ItemStack stack = new ItemStack(item, count);
+        // Spawn position
+        Vec3d spawnPos = target.getPos();
+        // Create and configure the item entity
+        ItemEntity entity = new ItemEntity(player.getWorld(), spawnPos.x, spawnPos.y + 0.5, spawnPos.z, stack);
+        // Pull velocity toward player
+        Vec3d velocity = player.getPos().add(0, 1.5, 0).subtract(spawnPos).normalize().multiply(0.3);entity.setVelocity(velocity);
+        // Spawn the item
+        player.getWorld().spawnEntity(entity);
+        //player.sendMessage(Text.literal("§aLoot should have been dropped."), false);
     }
 
     public static ItemStack getLootForPlayer(ServerPlayerEntity player, BlockPos bobberPos) {
