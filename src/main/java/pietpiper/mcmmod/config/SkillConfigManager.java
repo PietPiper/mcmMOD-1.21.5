@@ -178,30 +178,31 @@ public class SkillConfigManager {
             
               # The level at which you unlock each tier of treasure hunter.
               # For customization of each tiers treasure items and dropchances refer to fishing_treasures_config.yml
+              # Make sure each tier is a higher unlock than those below it.
               TreasureHunterTiers:
-                Tier_1: 10
-                Tier_2: 15
-                Tier_3: 25
-                Tier_4: 50
-                Tier_5: 75
-                Tier_6: 100
-                Tier_7: 150
-                Tier_8: 200
-                Tier_9: 300
-                Tier_10: 500
+                Tier_1: 100
+                Tier_2: 200
+                Tier_3: 300
+                Tier_4: 400
+                Tier_5: 500
+                Tier_6: 600
+                Tier_7: 700
+                Tier_8: 800
+                Tier_9: 900
+                Tier_10: 1000
             
               # Magic Hunter tier unlock levels
               MagicHunterTiers:
-                Tier_1: 0
-                Tier_2: 10
-                Tier_3: 25
-                Tier_4: 50
-                Tier_5: 75
-                Tier_6: 550
-                Tier_7: 600
-                Tier_8: 650
-                Tier_9: 700
-                Tier_10: 750
+                Tier_1: 150
+                Tier_2: 250
+                Tier_3: 350
+                Tier_4: 450
+                Tier_5: 550
+                Tier_6: 650
+                Tier_7: 750
+                Tier_8: 850
+                Tier_9: 950
+                Tier_10: 1050
             
               # The level at which you unlock ice fishing.
               IceFishingLevel: 30

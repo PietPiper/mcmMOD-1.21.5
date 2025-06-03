@@ -14,4 +14,5 @@ public interface FishingBobberAccessor {
 
     @Accessor("hookCountdown")
     int getHookCountdown();
+
 }

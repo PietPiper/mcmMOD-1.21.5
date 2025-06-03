@@ -1,5 +1,6 @@
 package pietpiper.mcmmod.skill.fishing;
 
+import com.jcraft.jorbis.Block;
 import net.fabricmc.fabric.api.item.v1.FabricComponentMapBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.*;
@@ -7,9 +8,12 @@ import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.component.ComponentsPredicate;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
@@ -232,47 +236,47 @@ Items:
 
 DropRates:
   Tier_1:
+    COMMON: 100
+    UNCOMMON: 0
+    RARE: 0
+    EPIC: 0
+    LEGENDARY: 0
+    MYTHIC: 0
+  Tier_2:
+    COMMON: 0
+    UNCOMMON: 100
+    RARE: 0
+    EPIC: 0
+    LEGENDARY: 0
+    MYTHIC: 0
+  Tier_3:
+    COMMON: 0
+    UNCOMMON: 0
+    RARE: 100
+    EPIC: 0
+    LEGENDARY: 0
+    MYTHIC: 0
+  Tier_4:
+    COMMON: 0
+    UNCOMMON: 0
+    RARE: 0
+    EPIC: 100
+    LEGENDARY: 0
+    MYTHIC: 0
+  Tier_5:
+    COMMON: 0
+    UNCOMMON: 0
+    RARE: 0
+    EPIC: 0
+    LEGENDARY: 100
+    MYTHIC: 0
+  Tier_6:
     COMMON: 0
     UNCOMMON: 0
     RARE: 0
     EPIC: 0
     LEGENDARY: 0
-    MYTHIC: 1
-  Tier_2:
-    COMMON: 7.5
-    UNCOMMON: 1.25
-    RARE: 0.25
-    EPIC: 0.1
-    LEGENDARY: 0.01
-    MYTHIC: 0.01
-  Tier_3:
-    COMMON: 7.5
-    UNCOMMON: 1.25
-    RARE: 0.25
-    EPIC: 0.1
-    LEGENDARY: 0.01
-    MYTHIC: 0.01
-  Tier_4:
-    COMMON: 7.5
-    UNCOMMON: 1.25
-    RARE: 0.25
-    EPIC: 0.1
-    LEGENDARY: 0.01
-    MYTHIC: 0.01
-  Tier_5:
-    COMMON: 7.5
-    UNCOMMON: 1.25
-    RARE: 0.25
-    EPIC: 0.1
-    LEGENDARY: 0.01
-    MYTHIC: 0.01
-  Tier_6:
-    COMMON: 7.5
-    UNCOMMON: 1.25
-    RARE: 0.25
-    EPIC: 0.1
-    LEGENDARY: 0.01
-    MYTHIC: 0.01
+    MYTHIC: 100
   Tier_7:
     COMMON: 7.5
     UNCOMMON: 1.25
@@ -377,59 +381,65 @@ Enchantment_Rarity:
 #  it will add as many enchantments as you get heads in a row)
 Enchantment_Drop_Rates:
   Tier_1:
-    COMMON: 5.0
-    UNCOMMON: 1.0
-    RARE: 0.1
-    EPIC: 0.01
-    LEGENDARY: 0.01
-    MYTHIC: 0.01
-    CURSES: 0.01
+    COMMON: 100
+    UNCOMMON: 0
+    RARE: 0
+    EPIC: 0
+    LEGENDARY: 0
+    MYTHIC: 0
+    CURSES: 50
     ExtraEnchantChance: 0.5
+    ExtraCurseChance: 0.5
   Tier_2:
-    COMMON: 7.5
-    UNCOMMON: 1.0
-    RARE: 0.1
-    EPIC: 0.01
-    LEGENDARY: 0.01
-    MYTHIC: 0.01
-    CURSES: 0.01
+    COMMON: 0
+    UNCOMMON: 100
+    RARE: 0
+    EPIC: 0
+    LEGENDARY: 0
+    MYTHIC: 0
+    CURSES: 50
     ExtraEnchantChance: 0.5
+    ExtraCurseChance: 0.5
   Tier_3:
-    COMMON: 7.5
-    UNCOMMON: 2.5
-    RARE: 0.25
-    EPIC: 0.1
-    LEGENDARY: 0.01
-    MYTHIC: 0.01
-    CURSES: 0.02
+    COMMON: 0
+    UNCOMMON: 0
+    RARE: 100
+    EPIC: 0
+    LEGENDARY: 0
+    MYTHIC: 0
+    CURSES: 50
     ExtraEnchantChance: 0.5
+    ExtraCurseChance: 0.5
   Tier_4:
-    COMMON: 10.0
-    UNCOMMON: 2.75
-    RARE: 0.5
-    EPIC: 0.1
-    LEGENDARY: 0.05
-    MYTHIC: 0.05
-    CURSES: 0.05
+    COMMON: 0
+    UNCOMMON: 0
+    RARE: 0
+    EPIC: 100
+    LEGENDARY: 0
+    MYTHIC: 0
+    CURSES: 50
     ExtraEnchantChance: 0.5
+    ExtraCurseChance: 0.5
   Tier_5:
-    COMMON: 10.0
-    UNCOMMON: 4.0
-    RARE: 0.75
-    EPIC: 0.25
-    LEGENDARY: 0.1
-    MYTHIC: 0.1
-    CURSES: 0.05
+    COMMON: 0
+    UNCOMMON: 0
+    RARE: 0
+    EPIC: 0
+    LEGENDARY: 100
+    MYTHIC: 0
+    CURSES: 50
     ExtraEnchantChance: 0.5
+    ExtraCurseChance: 0.5
   Tier_6:
-    COMMON: 9.5
-    UNCOMMON: 5.5
-    RARE: 1.75
-    EPIC: 0.5
-    LEGENDARY: 0.25
-    MYTHIC: 0.25
-    CURSES: 0.05
+    COMMON: 0
+    UNCOMMON: 0
+    RARE: 0
+    EPIC: 0
+    LEGENDARY: 0
+    MYTHIC: 100
+    CURSES: 50
     ExtraEnchantChance: 0.5
+    ExtraCurseChance: 0.5
   Tier_7:
     COMMON: 0
     UNCOMMON: 0
@@ -438,7 +448,8 @@ Enchantment_Drop_Rates:
     LEGENDARY: 0
     MYTHIC: 1
     CURSES: 1
-    ExtraEnchantChance: 0.75
+    ExtraEnchantChance: 0.5
+    ExtraCurseChance: 0.5
   Tier_8:
     COMMON: 0
     UNCOMMON: 0
@@ -448,6 +459,7 @@ Enchantment_Drop_Rates:
     MYTHIC: 0
     CURSES: 0.5
     ExtraEnchantChance: 0.5
+    ExtraCurseChance: 0.5
   Tier_9:
     COMMON: 6.5
     UNCOMMON: 11.0
@@ -457,6 +469,7 @@ Enchantment_Drop_Rates:
     MYTHIC: 1.0
     CURSES: 0.15
     ExtraEnchantChance: 0.5
+    ExtraCurseChance: 0.5
   Tier_10:
     COMMON: 5.0
     UNCOMMON: 12.5
@@ -466,6 +479,7 @@ Enchantment_Drop_Rates:
     MYTHIC: 1.25
     CURSES: 0.2
     ExtraEnchantChance: 0.5
+    ExtraCurseChance: 0.5
     
 Magic_Find_EnchantXP:
   COMMON: 10
@@ -576,7 +590,7 @@ Shake_Drops:
         //player.sendMessage(Text.literal("§aLoot should have been dropped."), false);
     }
 
-    public static ItemStack getLootForPlayer(ServerPlayerEntity player, BlockPos bobberPos) {
+    public static ItemStack getLootForPlayer(ServerPlayerEntity player, FishingBobberEntity bobber, Vec3d lastCast) {
         UUID playerId = player.getUuid();
         FishingSpotData data = fishingSpotMap.get(playerId);
         int distFromSpot = SkillConfigManager.getMinFishingSpotDistance();
@@ -585,6 +599,8 @@ Shake_Drops:
         //int distSquared = 3 * 3;
         int maxFish = SkillConfigManager.getMaxFishPerSpot();
         //int maxFish = 9;
+
+        BlockPos bobberPos = bobber.getBlockPos();
 
         if (data == null) {
             fishingSpotMap.put(playerId, new FishingSpotData(bobberPos, 1));
@@ -628,12 +644,48 @@ Shake_Drops:
                     if (!matching.isEmpty()) {
                         LootEntry drop = matching.get(new Random().nextInt(matching.size()));
                         XPUtil.addXP(player.getUuid(), Skill.FISHING, drop.xp);
+                        spawnTreasureParticles((ServerWorld) player.getWorld(), lastCast, entry.getKey(), false);
                         return new ItemStack(drop.item, drop.amount);
                     }
                 }
             }
         }
         return getNonTreasureLoot(player);
+    }
+
+    public static void spawnTreasureParticles(ServerWorld world, Vec3d pos, String rarity, boolean enchanted) {
+        ServerReference.logConsole("[Fishing Particles] Particles spawned. Enchanted: " + enchanted);
+        int color = 0;
+        if(rarity != null) {
+            color = getRarityColor(rarity);
+        }
+        float scale = 0.40f;  // Particle size (can adjust)
+        DustParticleEffect dust = new DustParticleEffect(color, scale);
+
+        // When just spawning the enchanted particles after the fact.
+        if (enchanted) {
+            for (int i = 0; i < 10; i++) {
+                world.spawnParticles(ParticleTypes.ENCHANT, pos.getX(), pos.getY(), pos.getZ(), 2, .5, .5, .5, .5);
+            }
+        }
+        else {
+            // Spawn multiple particles for effect
+            for (int i = 0; i < 10; i++) {
+                world.spawnParticles(dust, pos.getX(), pos.getY(), pos.getZ(), 10, .5, .5, .5, .5);
+            }
+        }
+    }
+
+    public static int getRarityColor(String rarity) {
+        return switch (rarity.toUpperCase()) {
+            case "COMMON" -> 0x808080;      // Gray
+            case "UNCOMMON" -> 0x15B01C;    // Green
+            case "RARE" -> 0x0ECCEA;        // Blue
+            case "EPIC" -> 0xAA00FF;        // Purple
+            case "LEGENDARY" -> 0xFFAA00;   // Orange
+            case "MYTHIC" -> 0xDF0909;     // Red
+            default -> 0xFFFFFF;            // White fallback
+        };
     }
 
     private static ItemStack getNonTreasureLoot(ServerPlayerEntity player) {
@@ -665,10 +717,17 @@ Shake_Drops:
         return enchantmentDropRatesByTier.getOrDefault(tier, Map.of());
     }
 
-    public static double getContinueChanceForTier(String tier) {
-        Map<String, Double> tierMap = enchantmentDropRatesByTier.getOrDefault(tier, Map.of());
-        if (tierMap == null) return 0.0;
-        return tierMap.getOrDefault("ExtraEnchantChance", 0.0);
+    public static double getContinueChanceForTier(String tier, boolean curse) {
+        if(!curse) {
+            Map<String, Double> tierMap = enchantmentDropRatesByTier.getOrDefault(tier, Map.of());
+            if (tierMap == null) return 0.0;
+            return tierMap.getOrDefault("EXTRAENCHANTCHANCE", 0.0);
+        }
+        else {
+            Map<String, Double> tierMap = enchantmentDropRatesByTier.getOrDefault(tier, Map.of());
+            if (tierMap == null) return 0.0;
+            return tierMap.getOrDefault("EXTRACURSECHANCE", 0.0);
+        }
     }
 
     public static int getFishAtSpot(ServerPlayerEntity player) {

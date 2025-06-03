@@ -16,10 +16,12 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import org.objectweb.asm.Opcodes;
@@ -37,8 +39,14 @@ import pietpiper.mcmmod.skill.fishing.FishingLootManager;
 import pietpiper.mcmmod.skill.fishing.MagicFindManager;
 import pietpiper.mcmmod.util.ServerReference;
 
+import java.util.HashMap;
+import java.util.Map;
+
+
 @Mixin(FishingBobberEntity.class)
 public abstract class FishingBobberMixin {
+
+    public Map<PlayerEntity, Vec3d> castLocations = new HashMap<>();
 
     @Redirect(
             method = "use",
@@ -55,17 +63,20 @@ public abstract class FishingBobberMixin {
             // Award XP (optional here if not done elsewhere)
             // FishingSkill.onGainXp(serverPlayer, bobber);
 
-            // Generate treasure item based on level (adjust as needed)
-            ItemStack treasure = FishingLootManager.getLootForPlayer(serverPlayer, bobber.getBlockPos());
+            // Generate loot item based on level (adjust as needed)
+            ItemStack loot = FishingLootManager.getLootForPlayer(serverPlayer, bobber, castLocations.get(bobber.getPlayerOwner()));
             // Run through Magic Find logic
-            if (!treasure.isEmpty()) {
-                MagicFindManager.tryApplyMagicFind(treasure, serverPlayer);
+            if (!loot.isEmpty()) {
+                boolean didEnchant = MagicFindManager.tryApplyMagicFind(loot, serverPlayer);
+                if(didEnchant) {
+                    FishingLootManager.spawnTreasureParticles((ServerWorld) bobber.getPlayerOwner().getWorld(), castLocations.get(bobber.getPlayerOwner()), null, true);
+                }
             }
             //Increase stat anyway even if they didn't catch an actual fish.
-            if (!treasure.isIn(ItemTags.FISHES)) {
+            if (!loot.isIn(ItemTags.FISHES)) {
                 serverPlayer.increaseStat(Stats.FISH_CAUGHT, 1);
             }
-            return ObjectArrayList.of(treasure); // Replace vanilla loot with just this item
+            return ObjectArrayList.of(loot); // Replace vanilla loot with this item
         }
 
         // Fallback to no loot if not a server player
@@ -120,8 +131,8 @@ public abstract class FishingBobberMixin {
                 ServerReference.logConsole("River bonus % : " + riverFishingBonus);
                 ServerReference.logConsole("Because you are fishing in a river biome " + (this.waitCountdown - reduction) * (1 - riverFishingBonus/100.0) + " is your new cooldown instead of " + (this.waitCountdown - reduction));
             }
-            this.waitCountdown = Math.max(20, (int) ((this.waitCountdown - reduction) * ( 1 - riverFishingBonus )));
-
+            this.waitCountdown = Math.max(20, (int) ((this.waitCountdown - reduction) * ( 1 - riverFishingBonus/100.0 )));
+            castLocations.put(bobber.getPlayerOwner(), bobber.getPos());
         }
     }
     @Inject(
