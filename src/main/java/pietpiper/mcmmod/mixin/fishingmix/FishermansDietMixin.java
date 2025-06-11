@@ -1,4 +1,4 @@
-package pietpiper.mcmmod.mixin;
+package pietpiper.mcmmod.mixin.fishingmix;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;

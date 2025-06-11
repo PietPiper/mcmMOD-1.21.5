@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import pietpiper.mcmmod.data.PlayerDataManager;
-import pietpiper.mcmmod.mixin.FishingBobberAccessor;
+import pietpiper.mcmmod.mixin.fishingmix.FishingBobberAccessor;
 import pietpiper.mcmmod.skill.Skill;
 import pietpiper.mcmmod.config.SkillConfigManager;
 import pietpiper.mcmmod.skill.fishing.FishingLootManager;
@@ -74,16 +74,5 @@ public class FishingDebugManager {
             }
             return false;
         });
-    }
-
-    // Dumb reflection hack for private fields like waitCountdown
-    private static int getPrivate(FishingBobberEntity bobber, String fieldName) {
-        try {
-            var field = FishingBobberEntity.class.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.getInt(bobber);
-        } catch (Exception e) {
-            return -1;
-        }
     }
 }

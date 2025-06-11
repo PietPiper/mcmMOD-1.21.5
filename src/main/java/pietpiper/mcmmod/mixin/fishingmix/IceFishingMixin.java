@@ -1,4 +1,4 @@
-package pietpiper.mcmmod.mixin;
+package pietpiper.mcmmod.mixin.fishingmix;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
