@@ -1,13 +1,11 @@
 package pietpiper.mcmmod.data;
 
 import com.google.gson.Gson;
-import org.lwjgl.system.Platform;
+
 import pietpiper.mcmmod.config.ConfigManager;
-import pietpiper.mcmmod.util.ServerReference;
+import pietpiper.mcmmod.objects.PlayerSettings;
 import pietpiper.mcmmod.skill.Skill;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.UUID;
 
 public class PlayerSettingsManager {

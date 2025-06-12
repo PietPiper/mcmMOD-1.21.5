@@ -8,17 +8,19 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import pietpiper.mcmmod.data.PlacedBlockDatabaseManager;
 import pietpiper.mcmmod.util.ServerReference;
 
 @Mixin(BlockItem.class)
-public class BlockItemMixin {
+public class PlacedBlocksMixin {
 
-    @Inject(method = "place", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "place", at = @At("RETURN"))
     private void onPlace(ItemPlacementContext context, CallbackInfoReturnable<ActionResult> cir) {
         if (cir.getReturnValue() != ActionResult.SUCCESS) return;
 

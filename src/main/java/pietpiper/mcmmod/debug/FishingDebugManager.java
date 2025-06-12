@@ -8,6 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
+
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.mixin.fishingmix.FishingBobberAccessor;
 import pietpiper.mcmmod.skill.Skill;

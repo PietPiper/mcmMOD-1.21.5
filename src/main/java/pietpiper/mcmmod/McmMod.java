@@ -6,21 +6,22 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import pietpiper.mcmmod.command.DevCommandHandler;
-import pietpiper.mcmmod.config.ConfigManager;
-import pietpiper.mcmmod.config.MiningXpConfig;
-import pietpiper.mcmmod.config.SkillConfigManager;
+import pietpiper.mcmmod.config.*;
 import pietpiper.mcmmod.data.PlacedBlockDatabaseManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
-import pietpiper.mcmmod.data.DatabaseManager;
+import pietpiper.mcmmod.data.PrimaryDatabaseManager;
 import pietpiper.mcmmod.debug.FishingDebugManager;
-import pietpiper.mcmmod.skill.fishing.FishingLootManager;
+import pietpiper.mcmmod.skill.excavation.ExcavationSkill;
 import pietpiper.mcmmod.skill.mining.MiningSkill;
 import pietpiper.mcmmod.util.ServerReference;
 
@@ -46,11 +47,12 @@ public class McmMod implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			ConfigManager.load();
 			SkillConfigManager.load();
-			FishingLootManager.loadConfig();
-			MiningXpConfig.load();
-			DatabaseManager.connect(server);
+			FishingConfig.loadConfig();
+			MiningConfig.load();
+			ExcavationConfig.load();
+			PrimaryDatabaseManager.connect(server);
 			ServerReference.setServer(server);
-			PlacedBlockDatabaseManager.initialize(server);
+			PlacedBlockDatabaseManager.connect(server);
 		});
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -78,17 +80,20 @@ public class McmMod implements ModInitializer {
 			if (player.isCreative()) return;
 
 			ItemStack tool = player.getMainHandStack();
-			if (!tool.isIn(ItemTags.PICKAXES)) return;
 
 			if (PlacedBlockDatabaseManager.wasPlaced(serverWorld, pos)) {
 				PlacedBlockDatabaseManager.unmarkPlaced(serverWorld, pos);
 				ServerReference.logConsole("[Mining] A placed block was broken");
-				return;
 			}
-
-			ServerReference.logConsole("[Mining] A naturally generated block was broken");
-			MiningSkill.handleMinedBlock(player, state);
-			//Add XP gain here
+			else {
+				ServerReference.logConsole("[Mining] A naturally generated block was broken");
+				if (tool.isIn(ItemTags.PICKAXES)) {
+					MiningSkill.handleMinedBlock(player, state);
+				}
+				else if(tool.isIn(ItemTags.SHOVELS)) {
+					ExcavationSkill.handleMinedBlock(player, state);
+				}
+			}
 		});
 
 	}

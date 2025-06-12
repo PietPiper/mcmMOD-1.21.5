@@ -1,6 +1,8 @@
-package pietpiper.mcmmod.data;
+package pietpiper.mcmmod.objects;
 
 import pietpiper.mcmmod.config.ConfigManager;
+import pietpiper.mcmmod.data.PlayerDataManager;
+import pietpiper.mcmmod.data.PlayerSettingsManager;
 import pietpiper.mcmmod.skill.Skill;
 
 import java.util.EnumMap;
@@ -32,7 +34,7 @@ public class McmPlayer {
         }
     }
 
-    public void updateSettings(PlayerSettings playerSettings) {
+    public void setSettings(PlayerSettings playerSettings) {
         settings = playerSettings;
     }
 

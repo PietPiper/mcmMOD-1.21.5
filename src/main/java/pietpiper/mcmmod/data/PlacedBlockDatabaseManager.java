@@ -23,7 +23,7 @@ public class PlacedBlockDatabaseManager {
     /**
      * Initializes the SQLite database and loads all placed blocks into memory.
      */
-    public static void initialize(MinecraftServer server) {
+    public static void connect(MinecraftServer server) {
         try {
             Path dbPath = server.getSavePath(WorldSavePath.ROOT).resolve("placed_blocks.db");
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
@@ -41,7 +41,7 @@ public class PlacedBlockDatabaseManager {
                 """);
             }
 
-            loadAll(server);
+            loadAll();
             System.out.println("[SQLite] PlacedBlockDatabaseManager initialized at: " + dbPath);
         } catch (SQLException e) {
             System.err.println("[SQLite] Failed to initialize PlacedBlockDatabaseManager:");
@@ -52,7 +52,7 @@ public class PlacedBlockDatabaseManager {
     /**
      * Loads all placed blocks from the database into the in-memory cache.
      */
-    private static void loadAll(MinecraftServer server) {
+    private static void loadAll() {
         placedCache.clear();
         try (PreparedStatement stmt = connection.prepareStatement("SELECT dimension, x, y, z FROM " + TABLE_NAME);
              ResultSet rs = stmt.executeQuery()) {

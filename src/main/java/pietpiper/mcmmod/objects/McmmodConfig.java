@@ -1,4 +1,4 @@
-package pietpiper.mcmmod.config;
+package pietpiper.mcmmod.objects;
 
 // If values change make sure to update starting config file string as well. Values in here
 // are never actually referenced in code unless the config file fails to be loaded.

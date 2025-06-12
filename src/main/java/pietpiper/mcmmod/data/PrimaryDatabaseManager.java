@@ -1,8 +1,8 @@
 package pietpiper.mcmmod.data;
 
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
+
 import pietpiper.mcmmod.skill.Skill;
 
 import java.nio.file.Path;
@@ -14,7 +14,7 @@ import java.sql.*;
  * It creates a table named 'player_stats' that stores XP, RemainingXP, and Level
  * for each defined skill per player (keyed by UUID).
  */
-public class DatabaseManager {
+public class PrimaryDatabaseManager {
     // The singleton database connection shared across the mod
     private static Connection connection;
 
@@ -38,7 +38,7 @@ public class DatabaseManager {
                 stmt.execute("""
                             CREATE TABLE IF NOT EXISTS users (
                                 uuid TEXT PRIMARY KEY,
-                                settings TEXT NOT NULL
+                                settings TEXT NOT NULL,
                             );
                         """);
 
@@ -63,6 +63,7 @@ public class DatabaseManager {
                                 FOREIGN KEY (skill_name) REFERENCES skills(skill_name) ON DELETE CASCADE
                             );
                         """);
+                // PLAYER PLACED BLOCK TRACKING TABLE
             }
 
             for (Skill skill : Skill.values()) {

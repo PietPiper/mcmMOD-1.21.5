@@ -4,9 +4,11 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+
 import pietpiper.mcmmod.config.ConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.util.XPUtil;

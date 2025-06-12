@@ -1,10 +1,10 @@
 package pietpiper.mcmmod.config;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MiningXpConfig {
+public class MiningConfig {
     private static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("mcmmod");
     private static final File CONFIG_FILE = CONFIG_DIR.resolve("mining_xp_config.yml").toFile();
     private static final File DEFAULT_FILE = CONFIG_DIR.resolve("defaults/mining_xp_defaults.yml").toFile();

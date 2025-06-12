@@ -2,13 +2,17 @@ package pietpiper.mcmmod.data;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+
 import pietpiper.mcmmod.config.ConfigManager;
+import pietpiper.mcmmod.objects.McmPlayer;
+import pietpiper.mcmmod.objects.PlayerSettings;
 import pietpiper.mcmmod.skill.Skill;
 import pietpiper.mcmmod.util.ServerReference;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -26,7 +30,7 @@ public class PlayerDataManager {
     public static void initPlayer(UUID uuid) {
         PlayerSettings defaultSettings = new PlayerSettings();
         String insertUserSql = "INSERT OR IGNORE INTO users (uuid, settings) VALUES (?, ?)";
-        try (PreparedStatement ps = DatabaseManager.getConnection().prepareStatement(insertUserSql)) {
+        try (PreparedStatement ps = PrimaryDatabaseManager.getConnection().prepareStatement(insertUserSql)) {
             ps.setString(1, uuid.toString());
             ps.setString(2, GSON.toJson(defaultSettings));
             ps.executeUpdate();
@@ -39,7 +43,7 @@ public class PlayerDataManager {
         McmPlayer player = new McmPlayer(uuid);
 
         // Load existing skill data
-        try (PreparedStatement ps = DatabaseManager.getConnection().prepareStatement(
+        try (PreparedStatement ps = PrimaryDatabaseManager.getConnection().prepareStatement(
                 "SELECT skill_name, xp, remaining_xp, level FROM player_skills WHERE uuid = ?")) {
             ps.setString(1, uuid.toString());
             ResultSet rs = ps.executeQuery();
@@ -56,19 +60,18 @@ public class PlayerDataManager {
         }
 
         // Load settings from DB
-        try (PreparedStatement ps = DatabaseManager.getConnection().prepareStatement(
+        try (PreparedStatement ps = PrimaryDatabaseManager.getConnection().prepareStatement(
                 "SELECT settings FROM users WHERE uuid = ?")) {
             ps.setString(1, uuid.toString());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String json = rs.getString("settings");
                 PlayerSettings settings = GSON.fromJson(json, PlayerSettings.class);
-                player.updateSettings(settings);
+                player.setSettings(settings);
             }
         } catch (SQLException | JsonSyntaxException e) {
             e.printStackTrace();
         }
-
 
         activePlayers.put(uuid, player);
     }
@@ -103,7 +106,7 @@ public class PlayerDataManager {
                 remaining_xp = excluded.remaining_xp,
                 level = excluded.level;
         """;
-        try (PreparedStatement ps = DatabaseManager.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = PrimaryDatabaseManager.getConnection().prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             ps.setString(2, skill.getDisplayName());
             ps.setInt(3, xp);
@@ -135,8 +138,8 @@ public class PlayerDataManager {
 
     public static void saveSettings(UUID uuid, PlayerSettings settings) {
         McmPlayer player = activePlayers.get(uuid);
-        player.updateSettings(settings);
-        try (PreparedStatement ps = DatabaseManager.getConnection().prepareStatement(
+        player.setSettings(settings);
+        try (PreparedStatement ps = PrimaryDatabaseManager.getConnection().prepareStatement(
                 "UPDATE users SET settings = ? WHERE uuid = ?")) {
             ps.setString(1, GSON.toJson(settings));
             ps.setString(2, uuid.toString());

@@ -4,12 +4,11 @@
 	"refmap": "mcmmod.refmap.json",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin",
 		"fishingmix.FishingBobberMixin",
 		"fishingmix.IceFishingMixin",
-      "fishingmix.FishermansDietMixin",
+        "fishingmix.FishermansDietMixin",
 		"fishingmix.FishingBobberAccessor",
-		"BlockItemMixin"
+		"PlacedBlocksMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

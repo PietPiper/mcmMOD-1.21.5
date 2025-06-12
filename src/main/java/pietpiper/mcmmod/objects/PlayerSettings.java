@@ -1,8 +1,4 @@
-package pietpiper.mcmmod.data;
-
-import pietpiper.mcmmod.config.ConfigManager;
-
-import java.io.ObjectInputFilter;
+package pietpiper.mcmmod.objects;
 
 public class PlayerSettings {
     //Player uuid identifier? I'm not sure how I will store these when its being referenced, possibly keep an updated map in PlayerDataManager? (Talk to Scott about query runtime cost)

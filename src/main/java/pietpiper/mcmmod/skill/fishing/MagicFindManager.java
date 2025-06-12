@@ -1,5 +1,11 @@
 package pietpiper.mcmmod.skill.fishing;
 
+import pietpiper.mcmmod.config.SkillConfigManager;
+import pietpiper.mcmmod.data.PlayerDataManager;
+import pietpiper.mcmmod.skill.Skill;
+import pietpiper.mcmmod.util.ServerReference;
+import pietpiper.mcmmod.util.XPUtil;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -9,15 +15,8 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import pietpiper.mcmmod.config.SkillConfigManager;
-import pietpiper.mcmmod.data.PlayerDataManager;
-import pietpiper.mcmmod.skill.Skill;
-import pietpiper.mcmmod.util.ServerReference;
-import pietpiper.mcmmod.util.XPUtil;
 
 import java.util.*;
-
-import static net.minecraft.registry.RegistryKeys.ENCHANTMENT;
 
 public class MagicFindManager {
     private static final Random rand = new Random();
@@ -41,7 +40,7 @@ public class MagicFindManager {
         double roll = new Random().nextDouble();
         if(roll < totalEnchantChance / 100.0) {
             int enchantCount = rollCount(tier, false);
-            ServerReference.logConsole("[Magic Find] You rolled " + enchantCount + " enchants.");
+            ServerReference.logConsole("[MagicFindManager] You rolled " + enchantCount + " enchants.");
             while (applied < enchantCount) {
                 String rolledRarity;
                 do {
@@ -82,7 +81,7 @@ public class MagicFindManager {
             Map<Identifier, Integer> cursePool = FishingLootManager.getEnchantmentsForRarity("CURSES");
             if (cursePool != null && !cursePool.isEmpty()) {
                 int curseCount = rollCount(tier, true);
-                ServerReference.logConsole("[Magic Find] You rolled " + curseCount + " curses.");
+                ServerReference.logConsole("[MagicFindManager] You rolled " + curseCount + " curses.");
                 for (int i = 0; i < curseCount; i++) {
                     List<Map.Entry<Identifier, Integer>> curses = cursePool.entrySet().stream()
                             .filter(e -> !appliedEnchantments.contains(e.getKey()))

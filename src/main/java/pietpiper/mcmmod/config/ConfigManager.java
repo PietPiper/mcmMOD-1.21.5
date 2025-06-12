@@ -1,18 +1,20 @@
 package pietpiper.mcmmod.config;
 
 import net.fabricmc.loader.api.FabricLoader;
+
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+
+import pietpiper.mcmmod.objects.McmmodConfig;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class ConfigManager {
     private static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("MCMMOD");
