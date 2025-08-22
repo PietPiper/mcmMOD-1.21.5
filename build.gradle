@@ -3,12 +3,6 @@ plugins {
 	id 'maven-publish'
 }
 
-loom {
-	mixin {
-		defaultRefmapName = "mcmmod.refmap.json"
-	}
-}
-
 version = project.mod_version
 group = project.maven_group
 
@@ -17,13 +11,18 @@ base {
 }
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
+	// Add repositories for mod dependencies here
+	// Loom automatically includes essential Minecraft repositories
 }
 
+// Loom configuration
+loom {
+	mixin {
+		defaultRefmapName = "mcmmod.refmap.json"
+	}
+}
+
+// Fabric data generation
 fabricApi {
 	configureDataGeneration {
 		client = true
@@ -31,29 +30,46 @@ fabricApi {
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
+	// Minecraft & Mappings
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
+	// Fabric API
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	include implementation("com.google.code.gson:gson:2.10.1")
-	include implementation("org.yaml:snakeyaml:2.4")
-	include implementation("org.xerial:sqlite-jdbc:3.43.2.2")
 	modImplementation "net.fabricmc.fabric-api:fabric-networking-api-v1:${project.fabric_version}"
-	
+
+	// Old dependencies for YAML serializing
+	include implementation("com.google.code.gson:gson:${project.gson_version}")
+	include implementation("org.yaml:snakeyaml:${project.snakeyaml_version}")
+
+	// Database
+	include implementation("org.xerial:sqlite-jdbc:${project.sqlite_jdbc_version}")
+
+	// Code Generation
+	compileOnly "org.projectlombok:lombok:${project.lombok_version}"
+	annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"
+
+	// Dependency Injection
+	modImplementation "com.google.inject:guice:${project.guice_version}"
+	include "com.google.inject:guice:${project.guice_version}"
+
+	// YAML Serializing
+	modImplementation "com.fasterxml.jackson.core:jackson-databind:${project.jackson_version}"
+	modImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${project.jackson_version}"
+	include "com.fasterxml.jackson.core:jackson-databind:${project.jackson_version}"
+	include "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${project.jackson_version}"
 }
 
+// Process resources with version replacement
 processResources {
 	inputs.property "version", project.version
-
 	filesMatching("fabric.mod.json") {
 		expand "version": inputs.properties.version
 	}
 }
 
+// Java compilation settings
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 21
 }
@@ -61,22 +77,20 @@ tasks.withType(JavaCompile).configureEach {
 java {
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 	// if it is present.
-	// If you remove this line, sources will not be generated.
 	withSourcesJar()
-
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
 }
 
+// Packaging
 jar {
 	inputs.property "archivesName", project.base.archivesName
-
 	from("LICENSE") {
 		rename { "${it}_${inputs.properties.archivesName}"}
 	}
 }
 
-// configure the maven publication
+// Publishing config
 publishing {
 	publications {
 		create("mavenJava", MavenPublication) {
@@ -87,9 +101,6 @@ publishing {
 
 	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
+		// Publishing repositories
 	}
 }
