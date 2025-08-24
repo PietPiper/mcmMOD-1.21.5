@@ -26,14 +26,16 @@ import org.objectweb.asm.Opcodes;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import pietpiper.mcmmod.config.ConfigManager;
 import pietpiper.mcmmod.config.SkillConfigManager;
+import pietpiper.mcmmod.config.server.ServerSettings;
 import pietpiper.mcmmod.data.PlayerDataManager;
+import pietpiper.mcmmod.guice.GuiceService;
 import pietpiper.mcmmod.skill.Skill;
 import pietpiper.mcmmod.skill.fishing.FishingLootManager;
 import pietpiper.mcmmod.skill.fishing.MagicFindManager;
@@ -46,6 +48,10 @@ import java.util.Map;
 @Mixin(FishingBobberEntity.class)
 public abstract class FishingBobberMixin {
 
+    @Unique
+    private static final ServerSettings SERVER_SETTINGS = GuiceService.get(ServerSettings.class);
+
+    @Unique
     public Map<PlayerEntity, Vec3d> castLocations = new HashMap<>();
 
     @Redirect(
@@ -127,7 +133,7 @@ public abstract class FishingBobberMixin {
             }
 
             int reduction = minReduction + bobber.getRandom().nextInt(maxReduction - minReduction + 1);
-            if(ConfigManager.getConfig().debugMode) {
+            if(SERVER_SETTINGS.isDebugMode()) {
                 ServerReference.logConsole("River bonus % : " + riverFishingBonus);
                 ServerReference.logConsole("Because you are fishing in a river biome " + (this.waitCountdown - reduction) * (1 - riverFishingBonus/100.0) + " is your new cooldown instead of " + (this.waitCountdown - reduction));
             }

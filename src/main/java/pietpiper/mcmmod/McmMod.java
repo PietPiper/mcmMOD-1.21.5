@@ -1,5 +1,7 @@
 package pietpiper.mcmmod;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -17,31 +19,40 @@ import org.slf4j.LoggerFactory;
 
 import pietpiper.mcmmod.command.DevCommandHandler;
 import pietpiper.mcmmod.config.*;
+import pietpiper.mcmmod.config.server.ServerSettings;
 import pietpiper.mcmmod.data.PlacedBlockDatabaseManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.data.PrimaryDatabaseManager;
 import pietpiper.mcmmod.debug.FishingDebugManager;
+import pietpiper.mcmmod.guice.GuiceService;
+import pietpiper.mcmmod.guice.module.ConfigModule;
 import pietpiper.mcmmod.skill.excavation.ExcavationSkill;
 import pietpiper.mcmmod.skill.mining.MiningSkill;
 import pietpiper.mcmmod.util.ServerReference;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public class McmMod implements ModInitializer {
-	public static final String MOD_ID = "mcmmod";
+	private static final String MOD_ID = "mcmmod";
+	private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-
-	@Override
+    @Override
 	public void onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
 		LOGGER.info("Hello Fabric world!");
+
+        Injector injector;
+        try {
+			injector = Guice.createInjector(new ConfigModule());
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to load MCMMOD config", e);
+		}
+		GuiceService.setInjector(injector);
+		final ServerSettings SERVER_SETTINGS = injector.getInstance(ServerSettings.class);
 
 		//Initialze server reference for message broadcasting, load the config, initialize or connect database IN THAT ORDER.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
@@ -70,7 +81,7 @@ public class McmMod implements ModInitializer {
 		});
 
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
-			if(ConfigManager.getConfig().debugMode) {
+			if(SERVER_SETTINGS.isDebugMode()) {
 				FishingDebugManager.tick(server);
 			}
 		});
