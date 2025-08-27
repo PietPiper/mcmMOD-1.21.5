@@ -17,12 +17,6 @@
 	"entrypoints": {
 		"main": [
 			"pietpiper.mcmmod.McmMod"
-		],
-		"fabric-datagen": [
-			"pietpiper.mcmmod.datagen.McmModDataGenerator"
-		],
-		"client": [
-			"pietpiper.mcmmod.McmModClient"
 		]
 	},
 	"mixins": [

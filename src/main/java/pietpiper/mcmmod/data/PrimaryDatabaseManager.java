@@ -32,37 +32,35 @@ public class PrimaryDatabaseManager {
 
             try (Statement stmt = connection.createStatement()) {
                 // Enable foreign key support
-                stmt.execute("PRAGMA foreign_keys = ON;");
-
                 // USERS TABLE
                 stmt.execute("""
-                            CREATE TABLE IF NOT EXISTS users (
-                                uuid TEXT PRIMARY KEY,
-                                settings TEXT NOT NULL,
-                            );
-                        """);
+                    CREATE TABLE IF NOT EXISTS users (
+                        uuid TEXT PRIMARY KEY,
+                        settings TEXT NOT NULL
+                    );
+                """);
 
                 // SKILLS TABLE
-                stmt.execute("""
-                            CREATE TABLE IF NOT EXISTS skills (
-                                skill_name TEXT PRIMARY KEY,
-                                description TEXT
-                            );
-                        """);
+                                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS skills (
+                        skill_name TEXT PRIMARY KEY,
+                        description TEXT
+                    );
+                """);
 
                 // PLAYER_SKILLS TABLE (join table)
-                stmt.execute("""
-                            CREATE TABLE IF NOT EXISTS player_skills (
-                                uuid TEXT NOT NULL,
-                                skill_name TEXT NOT NULL,
-                                xp INTEGER NOT NULL,
-                                remaining_xp INTEGER NOT NULL,
-                                level INTEGER NOT NULL,
-                                PRIMARY KEY (uuid, skill_name),
-                                FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE,
-                                FOREIGN KEY (skill_name) REFERENCES skills(skill_name) ON DELETE CASCADE
-                            );
-                        """);
+                                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS player_skills (
+                        uuid TEXT NOT NULL,
+                        skill_name TEXT NOT NULL,
+                        xp INTEGER NOT NULL,
+                        remaining_xp INTEGER NOT NULL,
+                        level INTEGER NOT NULL,
+                        PRIMARY KEY (uuid, skill_name),
+                        FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE,
+                        FOREIGN KEY (skill_name) REFERENCES skills(skill_name) ON DELETE CASCADE
+                    );
+                """);
                 // PLAYER PLACED BLOCK TRACKING TABLE
             }
 

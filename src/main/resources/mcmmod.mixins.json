@@ -8,7 +8,6 @@
 		"fishingmix.IceFishingMixin",
         "fishingmix.FishermansDietMixin",
 		"fishingmix.FishingBobberAccessor",
-		"PlacedBlocksMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

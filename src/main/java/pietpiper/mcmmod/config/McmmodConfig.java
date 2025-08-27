@@ -1,6 +1,7 @@
 package pietpiper.mcmmod.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Builder;
 import lombok.Value;
 import pietpiper.mcmmod.config.server.ServerSettings;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @Value
 @Builder
+@JsonDeserialize(builder = McmmodConfig.McmmodConfigBuilder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class McmmodConfig {
     @Builder.Default ServerSettings serverSettings = ServerSettings.builder().build();

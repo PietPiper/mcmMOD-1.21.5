@@ -6,6 +6,7 @@ import pietpiper.mcmmod.config.ConfigManager;
 import pietpiper.mcmmod.objects.PlayerSettings;
 import pietpiper.mcmmod.skill.Skill;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class PlayerSettingsManager {
@@ -15,20 +16,6 @@ public class PlayerSettingsManager {
         PlayerSettings playerSettings = new PlayerSettings();
         if(ConfigManager.getConfig() != null) {
             playerSettings.fishingColor = ConfigManager.getConfig().defaultFishingColor;
-            playerSettings.tamingColor = ConfigManager.getConfig().defaultTamingColor;
-            playerSettings.miningColor = ConfigManager.getConfig().defaultMiningColor;
-            playerSettings.acrobaticsColor = ConfigManager.getConfig().defaultAcrobaticsColor;
-            playerSettings.woodcuttingColor = ConfigManager.getConfig().defaultWoodcuttingColor;
-            playerSettings.herbalismColor = ConfigManager.getConfig().defaultHerbalismColor;
-            playerSettings.excavationColor = ConfigManager.getConfig().defaultExcavationColor;
-            playerSettings.unarmedColor = ConfigManager.getConfig().defaultUnarmedColor;
-            playerSettings.archeryColor = ConfigManager.getConfig().defaultArcheryColor;
-            playerSettings.swordsColor = ConfigManager.getConfig().defaultSwordsColor;
-            playerSettings.axesColor = ConfigManager.getConfig().defaultAxesColor;
-            playerSettings.alchemyColor = ConfigManager.getConfig().defaultAlchemyColor;
-            playerSettings.smeltingColor = ConfigManager.getConfig().defaultSmeltingColor;
-            playerSettings.enchantingColor = ConfigManager.getConfig().defaultEnchantingColor;
-            playerSettings.glidingColor = ConfigManager.getConfig().defaultGlidingColor;
         }
         return playerSettings;
     }
@@ -39,22 +26,8 @@ public class PlayerSettingsManager {
 
     public static void setSkillBarColor(UUID uuid, Skill skill, int colorHex) {
         PlayerSettings settings = PlayerDataManager.getSettings(uuid);
-        switch (skill) {
-            case FISHING -> settings.fishingColor = colorHex;
-            case TAMING -> settings.tamingColor = colorHex;
-            case MINING -> settings.miningColor = colorHex;
-            case ACROBATICS -> settings.acrobaticsColor = colorHex;
-            case WOODCUTTING -> settings.woodcuttingColor = colorHex;
-            case HERBALISM -> settings.herbalismColor = colorHex;
-            case EXCAVATION -> settings.excavationColor = colorHex;
-            case UNARMED -> settings.unarmedColor = colorHex;
-            case ARCHERY -> settings.archeryColor = colorHex;
-            case SWORDS -> settings.swordsColor = colorHex;
-            case AXES -> settings.axesColor = colorHex;
-            case ALCHEMY -> settings.alchemyColor = colorHex;
-            case SMELTING -> settings.smeltingColor = colorHex;
-            case ENCHANTING -> settings.enchantingColor = colorHex;
-            case GLIDING -> settings.glidingColor = colorHex;
+        if (Objects.requireNonNull(skill) == Skill.FISHING) {
+            settings.fishingColor = colorHex;
         }
         PlayerDataManager.saveSettings(uuid, settings);
     }

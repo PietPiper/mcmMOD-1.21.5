@@ -16,25 +16,10 @@ import pietpiper.mcmmod.config.ConfigManager;
  * To add a new skill, define it here
  */
 public enum Skill {
-    FISHING("Fishing", "Cast lines and catch fish."),         // Aqua
-    TAMING("Taming", "Tame and use passive mobs."),           // Gold
-    MINING("Mining", "Break naturally generated blocks with a pick."), // Gray
-    ACROBATICS("Acrobatics", "Take fall damage and roll."),   // White
-    WOODCUTTING("Woodcutting", "Chop logs."),                 // Dark Green
-    HERBALISM("Herbalism", "Harvest crops and plants."),      // Green
-    EXCAVATION("Excavation", "Dig naturally generated blocks with a shovel."), // Yellow
-    UNARMED("Unarmed", "Fight without weapons."),             // Red
-    ARCHERY("Archery", "Shoot stuff."),                       // Dark Purple
-    SWORDS("Swords", "Slash enemies with swords."),           // Dark Red
-    AXES("Axes", "Chop and cleave with axes."),              // Dark Aqua
-    ALCHEMY("Alchemy", "Brew potions."),                      // Light Purple
-    SMELTING("Smelting", "Smelt stuff."),                     // Dark Blue
-    ENCHANTING("Enchanting", "Empower items with enchantments or remove them."), // Blue
-    GLIDING("Gliding", "Fly through the sky with elytra!");   // Black
+    FISHING("Fishing", "Cast lines and catch fish.");
 
     // The human-friendly name used in UI and commands
     private final String displayName;
-
 
     // Short description of the skill shown in help menus, hover text, etc.
     private final String description;
