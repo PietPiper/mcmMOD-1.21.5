@@ -7,7 +7,6 @@ import pietpiper.mcmmod.config.ConfigManager;
 import pietpiper.mcmmod.objects.McmPlayer;
 import pietpiper.mcmmod.objects.PlayerSettings;
 import pietpiper.mcmmod.skill.Skill;
-import pietpiper.mcmmod.util.ServerReference;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +15,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import static pietpiper.mcmmod.McmMod.log;
 
 public class PlayerDataManager {
     //Replace these with config file values eventually.
@@ -34,9 +35,9 @@ public class PlayerDataManager {
             ps.setString(1, uuid.toString());
             ps.setString(2, GSON.toJson(defaultSettings));
             ps.executeUpdate();
-            ServerReference.logConsole("Initialized user row for player: [" + uuid + "]");
+            log.info("Initialized user row for player: [{}]", uuid);
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
         // Load player data into memory
@@ -56,7 +57,7 @@ public class PlayerDataManager {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
         // Load settings from DB
@@ -70,7 +71,7 @@ public class PlayerDataManager {
                 player.setSettings(settings);
             }
         } catch (SQLException | JsonSyntaxException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
         activePlayers.put(uuid, player);
@@ -114,7 +115,7 @@ public class PlayerDataManager {
             ps.setInt(5, level);
             ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 
@@ -145,7 +146,7 @@ public class PlayerDataManager {
             ps.setString(2, uuid.toString());
             ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 }

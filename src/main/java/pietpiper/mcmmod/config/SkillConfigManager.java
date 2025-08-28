@@ -2,7 +2,6 @@ package pietpiper.mcmmod.config;
 
 import net.fabricmc.loader.api.FabricLoader;
 import org.yaml.snakeyaml.Yaml;
-import pietpiper.mcmmod.util.ServerReference;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,6 +13,8 @@ import java.nio.file.Path;
 
 import java.util.Map;
 import java.util.TreeMap;
+
+import static pietpiper.mcmmod.McmMod.log;
 
 public class SkillConfigManager {
     private static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("MCMMOD");
@@ -82,7 +83,7 @@ public class SkillConfigManager {
             boatBonusMaxTicks = (int) fishing.getOrDefault("BoatBonusReductionMaxTicks", 0);
 
             riverBiomeBonus = (int) fishing.getOrDefault("RiverBiomeBonus", 0);
-            System.out.println("River biome bonus: " + riverBiomeBonus);
+            log.debug("River biome bonus: {}", riverBiomeBonus);
 
             maxFishPerSpot = ((Number) fishing.getOrDefault("Max_Fish_Per_Spot", 9)).intValue();
             minFishingSpotDistance = ((Number) fishing.getOrDefault("New_Spot_Distance", 3)).intValue();
@@ -103,11 +104,10 @@ public class SkillConfigManager {
                 }
             }
 
-            ServerReference.logConsole("Skill tier config loaded.");
+            log.info("Skill tier config loaded.");
 
         } catch (Exception e) {
-            ServerReference.logConsole("Error loading skill_config.yml");
-            e.printStackTrace();
+            log.error("Error loading skill_config.yml: {}", e.getMessage());
         }
     }
 
@@ -306,15 +306,15 @@ public class SkillConfigManager {
 
             try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
                 writer.write(defaultYaml);
-                System.out.println("skill_config.yml created.");
+                log.info("skill_config.yml created.");
             }
 
             try (FileWriter writer = new FileWriter(DEFAULT_FILE)) {
                 writer.write(defaultYaml);
-                System.out.println("skill_config_default.yml created.");
+                log.info("skill_config_default.yml created.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 

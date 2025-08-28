@@ -38,11 +38,11 @@ import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.skill.Skill;
 import pietpiper.mcmmod.skill.fishing.FishingLootManager;
 import pietpiper.mcmmod.skill.fishing.MagicFindManager;
-import pietpiper.mcmmod.util.ServerReference;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static pietpiper.mcmmod.McmMod.log;
 
 @Mixin(FishingBobberEntity.class)
 public abstract class FishingBobberMixin {
@@ -121,16 +121,16 @@ public abstract class FishingBobberMixin {
                     .getId(biomeEntry.value());
             // Check if the biome is a river biome (using the default Minecraft ID)
             if (biomeId.equals(BiomeKeys.RIVER.getValue())) {
-                ServerReference.logConsole("You are in a river biome!");
+                log.debug("You are in a river biome!");
                 riverFishingBonus = SkillConfigManager.getRiverBiomeBonus();
             } else {
-                ServerReference.logConsole("Not a river biome. Current biome: " + biomeId);
+                log.debug("Not a river biome. Current biome: {}", biomeId);
             }
 
             int reduction = minReduction + bobber.getRandom().nextInt(maxReduction - minReduction + 1);
             if(ConfigManager.getConfig().debugMode) {
-                ServerReference.logConsole("River bonus % : " + riverFishingBonus);
-                ServerReference.logConsole("Because you are fishing in a river biome " + (this.waitCountdown - reduction) * (1 - riverFishingBonus/100.0) + " is your new cooldown instead of " + (this.waitCountdown - reduction));
+                log.debug("River bonus % : {}", riverFishingBonus);
+                log.debug("Because you are fishing in a river biome {} is your new cooldown instead of {}", (this.waitCountdown - reduction) * (1 - riverFishingBonus / 100.0), this.waitCountdown - reduction);
             }
             this.waitCountdown = Math.max(20, (int) ((this.waitCountdown - reduction) * ( 1 - riverFishingBonus/100.0 )));
             castLocations.put(bobber.getPlayerOwner(), bobber.getPos());
@@ -148,11 +148,10 @@ public abstract class FishingBobberMixin {
             int level = PlayerDataManager.getLevel(player.getUuid(), Skill.FISHING);
             double shakeChance = SkillConfigManager.getShakeChance(level);
 
-            // Optional debug message
-            ServerReference.logConsole("Shake Chance: " + String.format("%.1f", shakeChance * 100) + "%");
+            log.debug("Shake Chance: {}%", String.format("%.1f", shakeChance * 100));
 
             if (player.getRandom().nextDouble() < shakeChance) {
-                ServerReference.logConsole("Getting loot for the shake.");
+                log.info("Getting loot for the shake.");
                 FishingLootManager.handleShakeDrops(living, player);
             }
         }

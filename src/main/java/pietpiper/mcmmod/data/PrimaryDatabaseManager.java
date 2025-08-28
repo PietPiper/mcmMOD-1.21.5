@@ -6,7 +6,14 @@ import net.minecraft.util.WorldSavePath;
 import pietpiper.mcmmod.skill.Skill;
 
 import java.nio.file.Path;
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import static pietpiper.mcmmod.McmMod.log;
 
 /**
  * SQLiteManager handles connecting to and initializing the mod's persistent SQLite database.
@@ -75,10 +82,9 @@ public class PrimaryDatabaseManager {
                 }
             }
 
-            System.out.println("[SQLite] Connected and initialized at: " + dbPath);
+            log.info("[SQLite] Connected and initialized at: {}", dbPath);
         } catch (SQLException e) {
-            System.err.println("[SQLite] Failed to connect or initialize database:");
-            e.printStackTrace();
+           log.error("[SQLite] Failed to connect or initialize database: {}", e.getMessage());
         }
     }
 

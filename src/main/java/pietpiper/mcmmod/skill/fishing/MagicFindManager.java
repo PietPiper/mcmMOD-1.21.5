@@ -3,7 +3,6 @@ package pietpiper.mcmmod.skill.fishing;
 import pietpiper.mcmmod.config.SkillConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.skill.Skill;
-import pietpiper.mcmmod.util.ServerReference;
 import pietpiper.mcmmod.util.XPUtil;
 
 import net.minecraft.enchantment.Enchantment;
@@ -16,7 +15,13 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
+import static pietpiper.mcmmod.McmMod.log;
 
 public class MagicFindManager {
     private static final Random rand = new Random();
@@ -40,7 +45,7 @@ public class MagicFindManager {
         double roll = new Random().nextDouble();
         if(roll < totalEnchantChance / 100.0) {
             int enchantCount = rollCount(tier, false);
-            ServerReference.logConsole("[MagicFindManager] You rolled " + enchantCount + " enchants.");
+            log.debug("[MagicFindManager] You rolled {} enchants.", enchantCount);
             while (applied < enchantCount) {
                 String rolledRarity;
                 do {
@@ -81,7 +86,7 @@ public class MagicFindManager {
             Map<Identifier, Integer> cursePool = FishingLootManager.getEnchantmentsForRarity("CURSES");
             if (cursePool != null && !cursePool.isEmpty()) {
                 int curseCount = rollCount(tier, true);
-                ServerReference.logConsole("[MagicFindManager] You rolled " + curseCount + " curses.");
+                log.debug("[MagicFindManager] You rolled {} curses.", curseCount);
                 for (int i = 0; i < curseCount; i++) {
                     List<Map.Entry<Identifier, Integer>> curses = cursePool.entrySet().stream()
                             .filter(e -> !appliedEnchantments.contains(e.getKey()))

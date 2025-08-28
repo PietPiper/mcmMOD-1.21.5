@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static pietpiper.mcmmod.McmMod.log;
+
 public class ConfigManager {
     private static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("MCMMOD");
     private static final File CONFIG_FILE = CONFIG_DIR.resolve("mcmmod.yml").toFile();
@@ -35,8 +37,8 @@ public class ConfigManager {
                 config = yaml.load(input);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            config = new McmmodConfig(); // fallback
+            log.error(e.getMessage());
+            config = new McmmodConfig();
         }
     }
 
@@ -72,7 +74,7 @@ public class ConfigManager {
                 writer.write(defaultYaml);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 

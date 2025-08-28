@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import pietpiper.mcmmod.config.skill.Skill;
 import pietpiper.mcmmod.config.skill.SkillConfig;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;

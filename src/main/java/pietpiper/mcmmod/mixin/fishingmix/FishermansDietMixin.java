@@ -16,12 +16,14 @@ import pietpiper.mcmmod.config.SkillConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.skill.Skill;
 
+import static pietpiper.mcmmod.McmMod.log;
+
 @Mixin(ItemStack.class)
 public abstract class FishermansDietMixin {
 
     @Inject(method = "finishUsing", at = @At("RETURN"), cancellable = true)
     private void applyFishermansDiet(World world, LivingEntity user, CallbackInfoReturnable<ItemStack> cir) {
-        System.out.println("[FishingDietMixin] you ate something!");
+        log.debug("[FishingDietMixin] you ate something!");
         if (!(user instanceof PlayerEntity player) || world.isClient) return;
 
         ItemStack stack = (ItemStack) (Object) this;

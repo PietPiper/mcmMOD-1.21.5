@@ -1,20 +1,19 @@
 package pietpiper.mcmmod.skill.fishing;
 
-import static pietpiper.mcmmod.config.FishingConfig.*;
+
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.item.Item;
 import pietpiper.mcmmod.config.FishingConfig;
 import pietpiper.mcmmod.config.SkillConfigManager;
 import pietpiper.mcmmod.data.PlayerDataManager;
 import pietpiper.mcmmod.skill.Skill;
-import pietpiper.mcmmod.util.ServerReference;
 import pietpiper.mcmmod.util.XPUtil;
 
-import net.minecraft.component.*;
 import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.projectile.FishingBobberEntity;
-import net.minecraft.item.*;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
@@ -25,13 +24,26 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 import com.mojang.authlib.GameProfile;
+
+import static pietpiper.mcmmod.McmMod.log;
+import static pietpiper.mcmmod.config.FishingConfig.allLootEntries;
+import static pietpiper.mcmmod.config.FishingConfig.enchantXpByRarity;
+import static pietpiper.mcmmod.config.FishingConfig.enchantmentDropRatesByTier;
+import static pietpiper.mcmmod.config.FishingConfig.enchantmentRarityTable;
+import static pietpiper.mcmmod.config.FishingConfig.nonTreasureDropChances;
+import static pietpiper.mcmmod.config.FishingConfig.shakeDropTables;
+import static pietpiper.mcmmod.config.FishingConfig.tierDropRates;
+import static pietpiper.mcmmod.config.FishingConfig.xpPerEnchant;
 
 public class FishingLootManager {
 
@@ -97,7 +109,7 @@ public class FishingLootManager {
         // Spawn the item
         player.getWorld().spawnEntity(entity);
         //player.sendMessage(Text.literal("§aLoot should have been dropped."), false);
-        ServerReference.logConsole("[FishingLootManager] Shake lot should have been dropped.");
+        log.debug("[FishingLootManager] Shake lot should have been dropped.");
     }
 
     public static ItemStack getLootForPlayer(ServerPlayerEntity player, FishingBobberEntity bobber, Vec3d lastCast) {
@@ -149,7 +161,7 @@ public class FishingLootManager {
                             .map(Map.Entry::getValue)
                             .toList();
                     if (!matching.isEmpty()) {
-                        LootEntry drop = matching.get(new Random().nextInt(matching.size()));
+                        FishingConfig.LootEntry drop = matching.get(new Random().nextInt(matching.size()));
                         XPUtil.addXP(player.getUuid(), Skill.FISHING, drop.xp);
                         spawnTreasureParticles((ServerWorld) player.getWorld(), lastCast, entry.getKey(), false);
                         return new ItemStack(drop.item, drop.amount);
@@ -161,7 +173,7 @@ public class FishingLootManager {
     }
 
     public static void spawnTreasureParticles(ServerWorld world, Vec3d pos, String rarity, boolean enchanted) {
-        ServerReference.logConsole("[Fishing Particles] Particles spawned. Enchanted: " + enchanted);
+        log.debug("[Fishing Particles] Particles spawned. Enchanted: {}", enchanted);
         int color = 0;
         if(rarity != null) {
             color = getRarityColor(rarity);
@@ -201,7 +213,7 @@ public class FishingLootManager {
         for (Map.Entry<String, Double> entry : nonTreasureDropChances.entrySet()) {
             cumulative += entry.getValue();
             if (fallbackRoll < cumulative) {
-                LootEntry drop = allLootEntries.get(entry.getKey());
+                FishingConfig.LootEntry drop = allLootEntries.get(entry.getKey());
                 if (drop != null) {
                     XPUtil.addXP(player.getUuid(), Skill.FISHING, drop.xp);
                     return new ItemStack(drop.item, drop.amount);

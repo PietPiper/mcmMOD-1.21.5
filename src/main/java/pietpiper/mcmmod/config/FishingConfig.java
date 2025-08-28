@@ -1,7 +1,5 @@
 package pietpiper.mcmmod.config;
 
-import pietpiper.mcmmod.util.ServerReference;
-
 import net.fabricmc.loader.api.FabricLoader;
 
 import net.minecraft.item.Item;
@@ -17,7 +15,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import static pietpiper.mcmmod.McmMod.log;
 
 public class FishingConfig {
 
@@ -48,7 +52,7 @@ public class FishingConfig {
             for (String itemId : items.keySet()) {
                 Identifier id = Identifier.tryParse(itemId);
                 if (id == null || !Registries.ITEM.containsId(id)) {
-                    ServerReference.logConsole("Invalid item in config: " + itemId);
+                    log.info("Invalid item in config: {}", itemId);
                     continue;
                 }
                 Item item = Registries.ITEM.get(id);
@@ -137,12 +141,11 @@ public class FishingConfig {
                 }
             }
 
-            ServerReference.logConsole("Fishing loot config loaded successfully.");
-            System.out.println("[FishingConfig] Loaded " + enchantmentRarityTable.size() + " enchantment rarity categories.");
-            System.out.println("[FishingConfig] Loaded " + enchantmentDropRatesByTier.size() + " Magic Find drop rate tiers.");
+            log.info("Fishing loot config loaded successfully.");
+            log.debug("[FishingConfig] Loaded {} enchantment rarity categories.", enchantmentRarityTable.size());
+            log.debug("[FishingConfig] Loaded {} Magic Find drop rate tiers.", enchantmentDropRatesByTier.size());
         } catch (Exception e) {
-            ServerReference.logConsole("Error loading fishing loot config:");
-            e.printStackTrace();
+           log.error("Error loading fishing loot config: {}", e.getMessage());
         }
     }
 
@@ -479,15 +482,13 @@ public class FishingConfig {
 
             try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
                 writer.write(defaultYaml);
-                //ServerReference.logConsole("[FishingConfig] Fishing loot config created at: " + CONFIG_FILE);
             }
 
             try (FileWriter writer = new FileWriter(DEFAULT_FILE)) {
                 writer.write(defaultYaml);
-                //ServerReference.logConsole("[FishingConfig] Default fishing loot config created at: " + DEFAULT_FILE);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 
