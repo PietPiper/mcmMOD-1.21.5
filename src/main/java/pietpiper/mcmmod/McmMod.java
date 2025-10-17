@@ -93,6 +93,9 @@ public class McmMod implements ModInitializer {
 				else if(tool.isIn(ItemTags.SHOVELS)) {
 					ExcavationSkill.handleMinedBlock(player, state);
 				}
+				else if(tool.isIn(ItemTags.AXES)) {
+					WoodcuttingSkill.handleMinedBlock(player, state);
+				}
 			}
 		});
 
