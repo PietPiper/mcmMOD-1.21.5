@@ -23,6 +23,7 @@ import pietpiper.mcmmod.data.PrimaryDatabaseManager;
 import pietpiper.mcmmod.debug.FishingDebugManager;
 import pietpiper.mcmmod.skill.excavation.ExcavationSkill;
 import pietpiper.mcmmod.skill.mining.MiningSkill;
+import pietpiper.mcmmod.skill.woodcutting.WoodcuttingSkill;
 import pietpiper.mcmmod.util.ServerReference;
 
 import java.util.UUID;

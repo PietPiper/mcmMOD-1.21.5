@@ -1,11 +1,11 @@
-package pietpiper.mcmmod.skill.mining;
+package pietpiper.mcmmod.skill.woodcutting;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import pietpiper.mcmmod.config.MiningConfig;
+import pietpiper.mcmmod.config.WoodcuttingConfig;
 import pietpiper.mcmmod.skill.Skill;
 import pietpiper.mcmmod.util.XPUtil;
 

@@ -41,7 +41,7 @@ public class WoodcuttingConfig {
                         blockXpMap.put(block, xp);
                     }
                     else {
-                        System.err.println("Failed to load woodcutting XP for " + key " block.")
+                        System.err.println("Failed to load woodcutting XP for " + key + " block.");
                     }
                 }
             }
