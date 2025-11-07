@@ -1,7 +1,11 @@
 package pietpiper.mcmmod.config.skill;
 
+import lombok.RequiredArgsConstructor;
+
 import java.awt.Color;
 
+/** In-game skills. **/
+@RequiredArgsConstructor
 public enum Skill {
     FISHING(Color.CYAN),
     TAMING(new Color(0xFFAA00)),
@@ -21,10 +25,20 @@ public enum Skill {
 
     private final Color defaultColor;
 
-    Skill(Color defaultColor) {
-        this.defaultColor = defaultColor;
+    /**
+     * Returns the default {@link Color} of this {@link Skill}.
+     *
+     * @return The default {@link Color} of this {@link Skill}.
+     */
+    public Color defaultColor() {
+        return defaultColor;
     }
 
+    /**
+     * Returns the default {@link SkillConfig} for this {@link Skill}.
+     *
+     * @return The default {@link SkillConfig} for this {@link Skill}.
+     */
     public SkillConfig defaultConfig() {
         return SkillConfig.builder()
                 .enabled(true)
