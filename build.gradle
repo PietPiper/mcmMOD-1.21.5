@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'fabric-loom' version '1.12-SNAPSHOT'
 	id 'maven-publish'
 	id 'jacoco'
 }
@@ -14,13 +14,6 @@ base {
 repositories {
 	// Add repositories for mod dependencies here
 	// Loom automatically includes essential Minecraft repositories
-}
-
-// Loom configuration
-loom {
-	mixin {
-		defaultRefmapName = "mcmmod.refmap.json"
-	}
 }
 
 // Fabric data generation
