@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
+	id 'jacoco'
 }
 
 version = project.mod_version
@@ -29,6 +30,10 @@ fabricApi {
 	}
 }
 
+configurations {
+	mockitoAgent
+}
+
 dependencies {
 	// Minecraft & Mappings
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -38,10 +43,6 @@ dependencies {
 	// Fabric API
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-networking-api-v1:${project.fabric_version}"
-
-	// Old dependencies for YAML serializing
-	include implementation("com.google.code.gson:gson:${project.gson_version}")
-	include implementation("org.yaml:snakeyaml:${project.snakeyaml_version}")
 
 	// Database
 	include implementation("org.xerial:sqlite-jdbc:${project.sqlite_jdbc_version}")
@@ -59,6 +60,17 @@ dependencies {
 	modImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${project.jackson_version}"
 	include "com.fasterxml.jackson.core:jackson-databind:${project.jackson_version}"
 	include "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${project.jackson_version}"
+
+	// Testing
+	testImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_version}"
+	runtimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_engine_version}"
+	testImplementation "org.junit.platform:junit-platform-launcher:${project.junit_launcher_version}"
+
+	testImplementation "org.mockito:mockito-core:${project.mockito_version}"
+	mockitoAgent("org.mockito:mockito-core:${project.mockito_version}") {
+		transitive = false
+	}
+	testImplementation "org.mockito:mockito-junit-jupiter:${project.mockito_version}"
 }
 
 // Process resources with version replacement
@@ -80,6 +92,25 @@ java {
 	withSourcesJar()
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Test configuration
+tasks.test {
+	useJUnitPlatform()
+	jvmArgs "-javaagent:${configurations.mockitoAgent.singleFile.absolutePath}"
+	finalizedBy("jacocoTestReport")
+}
+
+jacoco {
+	toolVersion = "0.8.13"
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
 }
 
 // Packaging

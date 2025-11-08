@@ -3,17 +3,17 @@ package pietpiper.mcmmod.guice.modules;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import lombok.NonNull;
 import net.fabricmc.loader.api.FabricLoader;
+import pietpiper.mcmmod.config.AppConfig;
 import pietpiper.mcmmod.config.readers.ServerSettingsReader;
 import pietpiper.mcmmod.config.readers.SkillConfigReader;
 import pietpiper.mcmmod.config.server.ServerSettings;
 import pietpiper.mcmmod.config.skill.Skill;
 import pietpiper.mcmmod.config.skill.SkillConfig;
+import pietpiper.mcmmod.config.skill.SkillConfigs;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Map;
 
 import static pietpiper.mcmmod.constants.ModConstants.MOD_ID;
@@ -44,20 +44,21 @@ public class ConfigModule extends AbstractModule {
      */
     @Provides
     @Singleton
-    public Map<Skill, SkillConfig> provideSkillConfigs(
+    public SkillConfigs provideSkillConfigs(
             @NonNull final SkillConfigReader skillConfigReader) throws IOException {
         return skillConfigReader.readAll();
     }
 
     /**
-     * Provides the config directory path for the mod.
+     * Provides the {@link AppConfig} the mod.
      *
-     * @return {@link Path} to the mod config directory.
+     * @return {@link AppConfig} to the mod config directory.
      */
     @Provides
     @Singleton
-    @Named("ConfigDirectory")
-    public Path provideConfigDirectory() {
-        return FabricLoader.getInstance().getConfigDir().resolve(MOD_ID);
+    public AppConfig  provideConfigDirectory() {
+        return AppConfig.builder()
+                .configDirectory(FabricLoader.getInstance().getConfigDir().resolve(MOD_ID))
+                .build();
     }
 }

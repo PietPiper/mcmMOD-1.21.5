@@ -3,11 +3,13 @@ package pietpiper.mcmmod.config.readers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import pietpiper.mcmmod.config.AppConfig;
 import pietpiper.mcmmod.config.skill.Skill;
 import pietpiper.mcmmod.config.skill.SkillConfig;
+import pietpiper.mcmmod.config.skill.SkillConfigs;
 import pietpiper.mcmmod.config.writers.SkillConfigWriter;
 
 import java.awt.Color;
@@ -25,21 +27,21 @@ import static pietpiper.mcmmod.constants.ConfigConstants.SKILL_SETTINGS_DIRECTOR
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SkillConfigReader {
 
-  @Named("ConfigDirectory") private final Path configDirectory;
+   private final AppConfig appConfig;
   private final SkillConfigWriter skillConfigWriter;
   private final ObjectMapper configMapper;
 
   private Path getSkillsDir() {
-    return configDirectory.resolve(SKILL_SETTINGS_DIRECTORY_NAME);
+    return appConfig.getConfigDirectory().resolve(SKILL_SETTINGS_DIRECTORY_NAME);
   }
 
   /**
-   * Read all {@link SkillConfig} config files.
+   * Read all {@link SkillConfig} into a {@link SkillConfigs}.
    *
-   * @return {@link Map} of a {@link Skill} to it's {@link SkillConfig}.
+   * @return {@link SkillConfigs}.
    * @throws IOException If reading fails.
    */
-  public Map<Skill, SkillConfig> readAll() throws IOException {
+  public SkillConfigs readAll() throws IOException {
     Files.createDirectories(getSkillsDir());
 
     final Map<Skill, SkillConfig> result = new EnumMap<>(Skill.class);
@@ -50,7 +52,9 @@ public class SkillConfigReader {
       result.put(skill, ensureDefaults(skill, cfg));
     }
 
-    return Map.copyOf(result);
+    return SkillConfigs.builder()
+            .skillConfigs(Map.copyOf(result))
+            .build();
   }
 
   /**
@@ -64,7 +68,7 @@ public class SkillConfigReader {
   private SkillConfig readOrCreate(@NonNull final Skill skill,
                                    @NonNull final Path file) throws IOException {
     if (!Files.exists(file)) {
-      log.info("Config for {} does not exist, creating one", skill.name());
+      log.info("Config for {} does not exist, creating one", StringUtils.capitalize(skill.name()));
       skillConfigWriter.writeDefault(skill, file);
     }
 
@@ -84,7 +88,7 @@ public class SkillConfigReader {
                                      @NonNull final SkillConfig cfg) {
     Color color = cfg.getColor();
     if (color == null) {
-      log.info("Setting {} to its default color", skill.name());
+      log.info("Setting {} to its default color", skill.name().toLowerCase());
       color = skill.defaultColor();
     }
 

@@ -1,13 +1,13 @@
 package pietpiper.mcmmod.config.server;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
 /** Settings for the server. **/
 @Value
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Jacksonized
 public class ServerSettings {
     @Builder.Default int maxLevel = 10000;
     @Builder.Default int startingLevel = 0;

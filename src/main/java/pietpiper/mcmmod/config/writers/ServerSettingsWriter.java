@@ -3,8 +3,8 @@ package pietpiper.mcmmod.config.writers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
+import pietpiper.mcmmod.config.AppConfig;
 import pietpiper.mcmmod.config.server.ServerSettings;
 
 import java.io.FileWriter;
@@ -19,11 +19,11 @@ import static pietpiper.mcmmod.constants.ConfigConstants.SERVER_SETTINGS_FILE_NA
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ServerSettingsWriter {
 
-  @Named("ConfigDirectory") private final Path configDirectory;
+  private final AppConfig appConfig;
   private final ObjectMapper configMapper;
 
   private Path getFilePath() {
-    return configDirectory.resolve(SERVER_SETTINGS_FILE_NAME);
+    return appConfig.getConfigDirectory().resolve(SERVER_SETTINGS_FILE_NAME);
   }
 
   /**
