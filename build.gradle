@@ -39,6 +39,8 @@ dependencies {
 
 	// Database
 	include implementation("org.xerial:sqlite-jdbc:${project.sqlite_jdbc_version}")
+	modImplementation "commons-dbutils:commons-dbutils:${project.db_utils_version}"
+	modImplementation "com.zaxxer:HikariCP:${project.hikari_cp_version}"
 
 	// Code Generation
 	compileOnly "org.projectlombok:lombok:${project.lombok_version}"

@@ -1,11 +1,17 @@
 package pietpiper.mcmmod.guice.modules;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import net.fabricmc.loader.api.FabricLoader;
 import pietpiper.mcmmod.config.AppConfig;
+import pietpiper.mcmmod.config.converters.ColorDeserializer;
+import pietpiper.mcmmod.config.converters.ColorSerializer;
 import pietpiper.mcmmod.config.readers.ServerSettingsReader;
 import pietpiper.mcmmod.config.readers.SkillConfigReader;
 import pietpiper.mcmmod.config.server.ServerSettings;
@@ -13,6 +19,7 @@ import pietpiper.mcmmod.config.skill.Skill;
 import pietpiper.mcmmod.config.skill.SkillConfig;
 import pietpiper.mcmmod.config.skill.SkillConfigs;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.Map;
 
@@ -20,6 +27,26 @@ import static pietpiper.mcmmod.constants.ModConstants.MOD_ID;
 
 /** Guice module for mod configuration components. **/
 public class ConfigModule extends AbstractModule {
+
+    /**
+     * Provides the config mapper for serializing and deserializing.
+     *
+     * @return The {@link ObjectMapper} for configs.
+     */
+    @Provides
+    @Singleton
+    public ObjectMapper providerConfigMapper() {
+        final ObjectMapper configMapper =
+                new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
+                        .findAndRegisterModules();
+
+        final SimpleModule module = new SimpleModule();
+        module.addSerializer(Color.class, new ColorSerializer());
+        module.addDeserializer(Color.class, new ColorDeserializer());
+        configMapper.registerModule(module);
+
+        return configMapper;
+    }
 
     /**
      * Provides the {@link ServerSettings}.
