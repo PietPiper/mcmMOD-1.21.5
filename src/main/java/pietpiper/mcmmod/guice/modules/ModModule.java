@@ -15,8 +15,10 @@ public class ModModule extends AbstractModule {
     bind(MinecraftServer.class).toInstance(server);
 
     install(new ConfigModule());
+
     install(new DatabaseModule());
 
     install(new DalModule());
+    install(new BalModule());
   }
 }

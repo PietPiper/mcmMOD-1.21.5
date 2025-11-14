@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static pietpiper.mcmmod.constants.ConfigConstants.SERVER_SETTINGS_FILE_NAME;
+import static pietpiper.mcmmod.constants.FileNames.SERVER_SETTINGS_FILE_NAME;
 
 /** Writer for {@link ServerSettings} to file. */
 @Singleton

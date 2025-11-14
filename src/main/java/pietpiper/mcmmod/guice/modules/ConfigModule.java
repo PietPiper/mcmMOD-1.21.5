@@ -23,7 +23,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.Map;
 
-import static pietpiper.mcmmod.constants.ModConstants.MOD_ID;
+import static pietpiper.mcmmod.constants.ModMetaData.MOD_ID;
 
 /** Guice module for mod configuration components. **/
 public class ConfigModule extends AbstractModule {

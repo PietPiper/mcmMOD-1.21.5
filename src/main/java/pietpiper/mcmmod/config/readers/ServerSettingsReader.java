@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static pietpiper.mcmmod.McmMod.log;
-import static pietpiper.mcmmod.constants.ConfigConstants.SERVER_SETTINGS_FILE_NAME;
+import static pietpiper.mcmmod.constants.FileNames.SERVER_SETTINGS_FILE_NAME;
 
 /** Reader for the {@link ServerSettings}. **/
 @Singleton

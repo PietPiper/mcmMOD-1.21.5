@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 import java.nio.file.Path;
 
 import static pietpiper.mcmmod.McmMod.log;
-import static pietpiper.mcmmod.constants.ModConstants.MOD_ID;
+import static pietpiper.mcmmod.constants.ModMetaData.MOD_ID;
 
 /** Module configuring database components needed by the dal. */
 public class DatabaseModule extends AbstractModule {

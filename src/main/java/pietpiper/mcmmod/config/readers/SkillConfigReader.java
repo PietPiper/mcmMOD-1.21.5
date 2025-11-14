@@ -20,7 +20,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import static pietpiper.mcmmod.McmMod.log;
-import static pietpiper.mcmmod.constants.ConfigConstants.SKILL_SETTINGS_DIRECTORY_NAME;
+import static pietpiper.mcmmod.constants.FileNames.SKILL_SETTINGS_DIRECTORY_NAME;
 
 /** Reader for {@link SkillConfig}s. */
 @Singleton

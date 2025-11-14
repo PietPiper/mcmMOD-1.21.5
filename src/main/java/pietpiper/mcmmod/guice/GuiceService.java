@@ -1,12 +1,14 @@
 package pietpiper.mcmmod.guice;
 
 import com.google.inject.Injector;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
 /** Utility class to set and have access to a Guice {@link Injector} statically. */
 @UtilityClass
 public final class GuiceService {
 
+    @Getter
     private static Injector injector;
 
     /**

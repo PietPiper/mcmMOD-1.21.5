@@ -1,6 +1,7 @@
 package pietpiper.mcmmod.persistence.dal.models;
 
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.Value;
 
 import java.util.UUID;
@@ -9,6 +10,6 @@ import java.util.UUID;
 @Builder
 @Value
 public class Player {
-  UUID id;
-  String username;
+  @NonNull UUID id;
+  @NonNull String username;
 }

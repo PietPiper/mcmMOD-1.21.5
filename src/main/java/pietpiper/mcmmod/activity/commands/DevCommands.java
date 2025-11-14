@@ -1,4 +1,4 @@
-package pietpiper.mcmmod.commands;
+package pietpiper.mcmmod.activity.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
