@@ -12,6 +12,8 @@ import pietpiper.mcmmod.persistence.db.utils.SQLiteResponseCodeUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +36,9 @@ public class PlayerDaoImpl implements PlayerDao {
 
   private static final String SELECT_PLAYER_BY_ID_SQL =
           "SELECT id, username FROM players WHERE id = ?";
+
+  private static final String SELECT_ALL_PLAYERS_SQL =
+          "SELECT id, username FROM players ORDER BY username";
 
   @Override
   public void addPlayer(@NonNull final Player player) {
@@ -134,6 +139,23 @@ public class PlayerDaoImpl implements PlayerDao {
     }
   }
 
+  @Override
+  public List<Player> listPlayers() {
+    try {
+      List<Player> players = queryRunner.query(
+              SELECT_ALL_PLAYERS_SQL,
+              playersResultSetHandler
+      );
+
+      log.debug("Successfully retrieved {} players", players != null ? players.size() : 0);
+      return players != null ? players : new ArrayList<>();
+
+    } catch (SQLException e) {
+      log.error("Failed to retrieve player list", e);
+      return new ArrayList<>();
+    }
+  }
+
   private final ResultSetHandler<Player> playerResultSetHandler = (ResultSet rs) -> {
     if (rs.next()) {
       final UUID id = UUID.fromString(rs.getString("id"));
@@ -144,5 +166,19 @@ public class PlayerDaoImpl implements PlayerDao {
               .build();
     }
     return null;
+  };
+
+  private final ResultSetHandler<List<Player>> playersResultSetHandler = (ResultSet rs) -> {
+    List<Player> players = new ArrayList<>();
+    while (rs.next()) {
+      final UUID id = UUID.fromString(rs.getString("id"));
+      final String username = rs.getString("username");
+      Player player = Player.builder()
+              .id(id)
+              .username(username)
+              .build();
+      players.add(player);
+    }
+    return players;
   };
 }

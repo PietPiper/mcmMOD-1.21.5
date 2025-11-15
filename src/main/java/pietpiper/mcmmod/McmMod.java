@@ -1,14 +1,17 @@
 package pietpiper.mcmmod;
 
+import com.mojang.brigadier.CommandDispatcher;
 import lombok.NoArgsConstructor;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.ServerCommandSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pietpiper.mcmmod.activity.DevCommandsActivity;
 import pietpiper.mcmmod.activity.RegisterPlayerActivity;
+import pietpiper.mcmmod.activity.requests.CommandRegistrationRequest;
 import pietpiper.mcmmod.activity.utils.EventAdapter;
 import pietpiper.mcmmod.guice.GuiceService;
 import pietpiper.mcmmod.guice.modules.ModModule;
@@ -39,10 +42,7 @@ public class McmMod implements ModInitializer {
 			registerPlayerActivity = GuiceService.get(RegisterPlayerActivity.class);
 
 			databaseInitializer.initialize();
-
-			CommandRegistrationCallback.EVENT.register(
-							EventAdapter.adaptCommandRegistration(devCommandsActivity::execute)
-			);
+			registerCommands(server);
 
 			ServerPlayConnectionEvents.JOIN.register(
 							EventAdapter.adaptJoinEvent(registerPlayerActivity::execute)
@@ -52,5 +52,16 @@ public class McmMod implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			GuiceService.setInjector(null);
 		});
+	}
+
+	/**
+	 * Register commands for the server post server starting. This allows our injector to
+	 * initialize.
+	 *
+	 * @param server The {@link MinecraftServer} that started.
+	 */
+	private void registerCommands(MinecraftServer server) {
+		CommandDispatcher<ServerCommandSource> dispatcher = server.getCommandManager().getDispatcher();
+		devCommandsActivity.execute(CommandRegistrationRequest.of(dispatcher));
 	}
 }

@@ -8,6 +8,8 @@ import pietpiper.mcmmod.bal.baos.interfaces.PlayerBao;
 import pietpiper.mcmmod.persistence.dal.daos.interfaces.PlayerDao;
 import pietpiper.mcmmod.persistence.dal.models.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -88,6 +90,16 @@ public class PlayerBaoImpl implements PlayerBao {
     } catch (Exception e) {
       log.error("Error checking player existence for ID: {}", playerId, e);
       return false;
+    }
+  }
+
+  @Override
+  public List<Player> listPlayers() {
+    try {
+      return playerDao.listPlayers();
+    } catch (Exception e) {
+      log.error("Error retrieving player list", e);
+      return new ArrayList<>();
     }
   }
 }

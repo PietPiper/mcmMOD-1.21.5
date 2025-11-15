@@ -14,13 +14,15 @@ import static pietpiper.mcmmod.McmMod.log;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class DevCommandsActivity {
 
+  private final DevCommands devCommands;
+
   /**
    * Executes the command registration workflow.
    *
    * @param request The command registration request
    */
   public void execute(@NonNull CommandRegistrationRequest request) {
-    DevCommands.register(request.getDispatcher());
+    devCommands.register(request.getDispatcher());
     log.info("Registered commands");
   }
 }

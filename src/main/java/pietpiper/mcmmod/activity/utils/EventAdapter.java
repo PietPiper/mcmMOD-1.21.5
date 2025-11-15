@@ -1,9 +1,7 @@
 package pietpiper.mcmmod.activity.utils;
 
 import lombok.experimental.UtilityClass;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import pietpiper.mcmmod.activity.requests.CommandRegistrationRequest;
 import pietpiper.mcmmod.activity.requests.JoinEventRequest;
 
 import java.util.function.Consumer;
@@ -21,18 +19,5 @@ public class EventAdapter {
   public static ServerPlayConnectionEvents.Join adaptJoinEvent(Consumer<JoinEventRequest> consumer) {
     return (handler, sender, server) ->
             consumer.accept(JoinEventRequest.of(handler, sender, server));
-  }
-
-  /**
-   * Adapts a command registration event consumer to the raw event parameters.
-   *
-   * @param consumer the {@link Consumer} that processes the {@link CommandRegistrationRequest}
-   * @return a {@link CommandRegistrationCallback} event handler
-   */
-  public static CommandRegistrationCallback adaptCommandRegistration(Consumer<CommandRegistrationRequest> consumer) {
-    return (dispatcher,
-            registryAccess,
-            environment) ->
-            consumer.accept(CommandRegistrationRequest.of(dispatcher));
   }
 }

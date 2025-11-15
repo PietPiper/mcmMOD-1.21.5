@@ -3,6 +3,7 @@ package pietpiper.mcmmod.persistence.dal.daos.interfaces;
 import lombok.NonNull;
 import pietpiper.mcmmod.persistence.dal.models.Player;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,4 +39,11 @@ public interface PlayerDao {
    * @return An Optional containing the player if found, empty otherwise.
    */
   Optional<Player> getPlayer(@NonNull final UUID playerId);
+
+  /**
+   * Retrieves all players from the players table.
+   *
+   * @return A list of all players
+   */
+  List<Player> listPlayers();
 }

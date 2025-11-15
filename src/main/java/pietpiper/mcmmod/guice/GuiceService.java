@@ -15,6 +15,7 @@ public final class GuiceService {
      * Singleton setter for the {@link Injector}.
      *
      * @param inj The injector to set for the GuiceService
+     * @throws IllegalStateException if already set.
      */
     public static synchronized void setInjector(Injector inj) {
         if (injector != null) {

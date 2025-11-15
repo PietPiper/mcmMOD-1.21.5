@@ -3,6 +3,7 @@ package pietpiper.mcmmod.bal.baos.interfaces;
 import lombok.NonNull;
 import pietpiper.mcmmod.persistence.dal.models.Player;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,4 +50,11 @@ public interface PlayerBao {
    * @return true if the player exists, false otherwise
    */
   boolean playerExists(@NonNull final UUID playerId);
+
+  /**
+   * Retrieves all players from the system.
+   *
+   * @return A list of all players
+   */
+  List<Player> listPlayers();
 }
