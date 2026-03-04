@@ -3,6 +3,8 @@ package pietpiper.mcmmod.activity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import lombok.NonNull;
@@ -38,7 +40,7 @@ public class DevCommandsActivity {
    * @param dispatcher The command dispatcher to register commands with
    */
   private void register(@NonNull final CommandDispatcher<ServerCommandSource> dispatcher) {
-    LiteralArgumentBuilder<ServerCommandSource> adminCommand = buildAdminCommand();
+    final LiteralArgumentBuilder<ServerCommandSource> adminCommand = buildAdminCommand();
     dispatcher.register(adminCommand);
   }
 
@@ -50,12 +52,20 @@ public class DevCommandsActivity {
   private LiteralArgumentBuilder<ServerCommandSource> buildAdminCommand() {
     return literal("admin")
             .requires(source -> source.hasPermissionLevel(2))
+
             .then(literal("player")
                     .then(buildRegisterCommand())
                     .then(buildGetCommand())
                     .then(buildUpdateCommand())
                     .then(buildDeleteCommand())
                     .then(buildListCommand())
+            )
+
+            .then(literal("skill")
+                    .then(buildInitSkillsCommand())
+                    .then(buildGetSkillCommand())
+                    .then(buildListSkillsCommand())
+                    .then(buildSetSkillCommand())
             );
   }
 
@@ -130,5 +140,77 @@ public class DevCommandsActivity {
   private LiteralArgumentBuilder<ServerCommandSource> buildListCommand() {
     return literal("list")
             .executes(devCommandsManager::listPlayers);
+  }
+
+  /**
+   * Builds the skill initialization command.
+   *
+   * @return The built init command
+   */
+  private LiteralArgumentBuilder<ServerCommandSource> buildInitSkillsCommand() {
+    return literal("init")
+            .then(argument("playerId", StringArgumentType.string())
+                    .executes(context -> devCommandsManager.initializeSkills(
+                            context,
+                            StringArgumentType.getString(context, "playerId")
+                    ))
+            );
+  }
+
+  /**
+   * Builds the skill get command.
+   *
+   * @return The built get command
+   */
+  private LiteralArgumentBuilder<ServerCommandSource> buildGetSkillCommand() {
+    return literal("get")
+            .then(argument("playerId", StringArgumentType.string())
+                    .then(argument("skill", StringArgumentType.string())
+                            .executes(context -> devCommandsManager.getSkill(
+                                    context,
+                                    StringArgumentType.getString(context, "playerId"),
+                                    StringArgumentType.getString(context, "skill")
+                            ))
+                    )
+            );
+  }
+
+  /**
+   * Builds the skill list command.
+   *
+   * @return The built list command
+   */
+  private LiteralArgumentBuilder<ServerCommandSource> buildListSkillsCommand() {
+    return literal("list")
+            .then(argument("playerId", StringArgumentType.string())
+                    .executes(context -> devCommandsManager.listSkills(
+                            context,
+                            StringArgumentType.getString(context, "playerId")
+                    ))
+            );
+  }
+
+  /**
+   * Builds the skill set command.
+   *
+   * @return The built set command
+   */
+  private LiteralArgumentBuilder<ServerCommandSource> buildSetSkillCommand() {
+    return literal("set")
+            .then(argument("playerId", StringArgumentType.string())
+                    .then(argument("skill", StringArgumentType.string())
+                            .then(argument("level", IntegerArgumentType.integer())
+                                    .then(argument("xp", LongArgumentType.longArg())
+                                            .executes(context -> devCommandsManager.setSkill(
+                                                    context,
+                                                    StringArgumentType.getString(context, "playerId"),
+                                                    StringArgumentType.getString(context, "skill"),
+                                                    IntegerArgumentType.getInteger(context, "level"),
+                                                    LongArgumentType.getLong(context, "xp")
+                                            ))
+                                    )
+                            )
+                    )
+            );
   }
 }
