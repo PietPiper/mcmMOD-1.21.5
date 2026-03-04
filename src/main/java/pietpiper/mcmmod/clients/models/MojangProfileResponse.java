@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+/** Response from Mojang player endpoint. */
 @Value
 @Builder
 @Jacksonized

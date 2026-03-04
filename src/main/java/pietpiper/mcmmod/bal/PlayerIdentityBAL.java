@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+/** Businless logic for determining a players identity. */
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class PlayerIdentityBAL {

@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static pietpiper.mcmmod.McmMod.log;
 
+/** Client for calling Mojang endpoints. */
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class MojangClient {
@@ -84,8 +85,7 @@ public class MojangClient {
             });
   }
 
-  private UUID formatUuid(String raw) {
-
+  private UUID formatUuid(@NonNull final String raw) {
     String formatted =
             raw.substring(0, 8) + "-" +
                     raw.substring(8, 12) + "-" +
