@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.context.CommandContext;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import pietpiper.mcmmod.bal.PlayerIdentityBAL;
@@ -12,7 +13,6 @@ import pietpiper.mcmmod.bal.baos.interfaces.PlayerBao;
 import pietpiper.mcmmod.persistence.dal.models.Player;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -26,26 +26,44 @@ public class DevCommandsManager {
   private final PlayerBao playerBao;
 
   /**
-   * Registers a new player in the system.
+   * Registers a new player in the system by resolving their Mojang UUID.
    *
    * @param context The command context
    * @param username The username to register
-   * @return 1 on success
+   * @return 1 on command execution
    */
   public int registerPlayer(@NonNull final CommandContext<ServerCommandSource> context,
                             @NonNull final String username) {
 
-    final Optional<UUID> uuidOptional = playerIdentityBAL.resolveUuid(username);
-    if (uuidOptional.isEmpty()) {
-      sendError(context, "Username not found: " + username);
-      return 0;
-    }
+    final MinecraftServer server = context.getSource().getServer();
 
-    final UUID playerId = uuidOptional.get();
-    registerPlayerManager.registerPlayer(playerId, username);
+    sendFeedback(context, "Resolving Mojang UUID for username: " + username + "...");
 
-    sendSuccess(context,
-            "Registered player: " + username + " (" + playerId + ")");
+    playerIdentityBAL.resolveUuid(username)
+            .thenAccept(uuidOptional -> {
+
+              server.execute(() -> {
+
+                if (uuidOptional.isEmpty()) {
+                  sendError(context, "Username not found: " + username);
+                  return;
+                }
+
+                final UUID playerId = uuidOptional.get();
+                registerPlayerManager.registerPlayer(playerId, username);
+
+                sendSuccess(context,
+                        "Registered player: " + username + " (" + playerId + ")");
+              });
+
+            })
+            .exceptionally(ex -> {
+
+              server.execute(() ->
+                      sendError(context, "Failed to resolve Mojang UUID for username: " + username));
+
+              return null;
+            });
 
     return 1;
   }

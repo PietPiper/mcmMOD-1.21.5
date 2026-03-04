@@ -1,17 +1,21 @@
 package pietpiper.mcmmod.client.mojang;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import pietpiper.mcmmod.clients.models.MojangProfileResponse;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
+import static pietpiper.mcmmod.McmMod.log;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -20,48 +24,69 @@ public class MojangClient {
   private static final String MOJANG_PROFILE_URL =
           "https://api.mojang.com/users/profiles/minecraft/";
 
-  private final HttpClient httpClient;
+  private final HttpClient httpClient = HttpClient.newHttpClient();
+  private final ObjectMapper objectMapper;
 
   /**
-   * Resolves a Minecraft username to a UUID using Mojang's public API.
+   *  Resolves a Minecraft username to a UUID.
    *
    * @param username The Minecraft username
-   * @return Optional UUID if found, empty otherwise
+   * @return {@link CompletableFuture} containing Optional UUID
    */
-  public Optional<UUID> resolveUuid(@NonNull final String username) {
+  public CompletableFuture<Optional<UUID>> resolveUuid(@NonNull String username) {
 
-    try {
-      final HttpRequest request = HttpRequest.newBuilder()
-              .uri(URI.create(MOJANG_PROFILE_URL + username))
-              .GET()
-              .build();
+    log.debug("Resolving UUID for username: {}", username);
 
-      final HttpResponse<String> response =
-              httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+    HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(MOJANG_PROFILE_URL + username))
+            .GET()
+            .build();
 
-      if (response.statusCode() == 204) {
-        return Optional.empty();
-      }
+    return httpClient
+            .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+            .thenApply(response -> {
 
-      if (response.statusCode() != 200) {
-        return Optional.empty();
-      }
+              final int status = response.statusCode();
+              final String body = response.body();
 
-      final String body = response.body();
+              log.debug("Mojang API response for {}: status={}, body={}",
+                      username, status, body);
 
-      // {"id":"069a79f444e94726a5befca90e38aaf5","name":"Notch"}
-      String rawId = body.split("\"id\":\"")[1].split("\"")[0];
+              if (status == 204) {
+                log.debug("Username not found: {}", username);
+                return Optional.<UUID>empty();
+              }
 
-      return Optional.of(formatUuid(rawId));
+              if (status != 200) {
+                log.warn("Unexpected Mojang API status for {}: {}", username, status);
+                return Optional.<UUID>empty();
+              }
 
-    } catch (IOException | InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return Optional.empty();
-    }
+              try {
+
+                final MojangProfileResponse profile =
+                        objectMapper.readValue(body, MojangProfileResponse.class);
+
+                final UUID uuid = formatUuid(profile.getId());
+
+                log.debug("Resolved Mojang UUID for {} -> {}", username, uuid);
+
+                return Optional.of(uuid);
+
+              } catch (Exception e) {
+                log.error("Failed to parse Mojang response for {}: {}", username, body, e);
+                return Optional.<UUID>empty();
+              }
+            })
+            .exceptionally(ex -> {
+              log.error("Mojang API request failed for username: {}", username, ex);
+              return Optional.<UUID>empty();
+            });
   }
 
-  private UUID formatUuid(@NonNull final String raw) {
-    final String formatted =
+  private UUID formatUuid(String raw) {
+
+    String formatted =
             raw.substring(0, 8) + "-" +
                     raw.substring(8, 12) + "-" +
                     raw.substring(12, 16) + "-" +

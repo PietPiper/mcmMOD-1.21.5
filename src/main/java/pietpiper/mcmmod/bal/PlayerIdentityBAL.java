@@ -8,6 +8,7 @@ import pietpiper.mcmmod.client.mojang.MojangClient;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -19,9 +20,9 @@ public class PlayerIdentityBAL {
    * Resolves a Minecraft username to its permanent UUID.
    *
    * @param username The Minecraft username
-   * @return Optional UUID if the username exists
+   * @return {@link CompletableFuture} containing Optional UUID
    */
-  public Optional<UUID> resolveUuid(@NonNull final String username) {
+  public CompletableFuture<Optional<UUID>> resolveUuid(@NonNull final String username) {
     return mojangClient.resolveUuid(username);
   }
 }
