@@ -7,10 +7,12 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+import pietpiper.mcmmod.bal.PlayerIdentityBAL;
 import pietpiper.mcmmod.bal.baos.interfaces.PlayerBao;
 import pietpiper.mcmmod.persistence.dal.models.Player;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -19,6 +21,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class DevCommandsManager {
 
+  private final PlayerIdentityBAL playerIdentityBAL;
   private final RegisterPlayerManager registerPlayerManager;
   private final PlayerBao playerBao;
 
@@ -32,11 +35,18 @@ public class DevCommandsManager {
   public int registerPlayer(@NonNull final CommandContext<ServerCommandSource> context,
                             @NonNull final String username) {
 
-    // TODO: Resolve UUID
-    UUID playerId = UUID.randomUUID();
+    final Optional<UUID> uuidOptional = playerIdentityBAL.resolveUuid(username);
+    if (uuidOptional.isEmpty()) {
+      sendError(context, "Username not found: " + username);
+      return 0;
+    }
+
+    final UUID playerId = uuidOptional.get();
     registerPlayerManager.registerPlayer(playerId, username);
 
-    sendSuccess(context, "Registered player: " + username + " (" + playerId + ")");
+    sendSuccess(context,
+            "Registered player: " + username + " (" + playerId + ")");
+
     return 1;
   }
 
