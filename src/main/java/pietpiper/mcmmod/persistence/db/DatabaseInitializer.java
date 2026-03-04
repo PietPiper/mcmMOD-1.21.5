@@ -11,15 +11,35 @@ import static pietpiper.mcmmod.McmMod.log;
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class DatabaseInitializer {
+
   private final QueryRunner queryRunner;
 
   private static final String CREATE_PLAYERS_TABLE =
-      """
-      CREATE TABLE IF NOT EXISTS players (
-          id TEXT PRIMARY KEY,
-          username TEXT NOT NULL
-      )
-      """;
+          """
+          CREATE TABLE IF NOT EXISTS players (
+              id TEXT PRIMARY KEY,
+              username TEXT NOT NULL
+          )
+          """;
+
+  private static final String CREATE_PLAYER_SKILLS_TABLE =
+          """
+          CREATE TABLE IF NOT EXISTS player_skills (
+              player_id TEXT NOT NULL,
+              skill TEXT NOT NULL,
+              level INTEGER NOT NULL,
+              xp INTEGER NOT NULL,
+              metadata TEXT,
+              PRIMARY KEY (player_id, skill),
+              FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE
+          )
+          """;
+
+  private static final String CREATE_PLAYER_SKILLS_INDEX =
+          """
+          CREATE INDEX IF NOT EXISTS idx_player_skills_player_id
+          ON player_skills(player_id)
+          """;
 
   /** Runs database initialization. */
   public void initialize() {
@@ -29,7 +49,10 @@ public class DatabaseInitializer {
       queryRunner.update(CREATE_PLAYERS_TABLE);
       log.info("Players table initialized");
 
-      //TODO: More tables can be made here
+      queryRunner.update(CREATE_PLAYER_SKILLS_TABLE);
+      log.info("Player skills table initialized");
+
+      queryRunner.update(CREATE_PLAYER_SKILLS_INDEX);
 
       log.info("All database tables initialized successfully");
 

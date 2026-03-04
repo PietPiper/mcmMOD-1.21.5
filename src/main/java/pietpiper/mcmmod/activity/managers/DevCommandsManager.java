@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class DevCommandsManager {
 
+  private final RegisterPlayerManager registerPlayerManager;
   private final PlayerBao playerBao;
 
   /**
@@ -30,9 +31,10 @@ public class DevCommandsManager {
    */
   public int registerPlayer(@NonNull final CommandContext<ServerCommandSource> context,
                             @NonNull final String username) {
+
+    // TODO: Resolve UUID
     UUID playerId = UUID.randomUUID();
-    Player player = Player.builder().id(playerId).username(username).build();
-    playerBao.registerPlayer(player);
+    registerPlayerManager.registerPlayer(playerId, username);
 
     sendSuccess(context, "Registered player: " + username + " (" + playerId + ")");
     return 1;

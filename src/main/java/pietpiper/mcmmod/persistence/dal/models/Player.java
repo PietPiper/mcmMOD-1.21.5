@@ -12,4 +12,6 @@ import java.util.UUID;
 public class Player {
   @NonNull UUID id;
   @NonNull String username;
+
+  // TODO: Add created_at & updated_at fields
 }
