@@ -4,6 +4,8 @@ import com.google.inject.AbstractModule;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.server.MinecraftServer;
 
+import java.time.Clock;
+
 /** Entry point for all module installations. **/
 @RequiredArgsConstructor
 public class ModModule extends AbstractModule {
@@ -12,6 +14,8 @@ public class ModModule extends AbstractModule {
 
   @Override
   protected void configure() {
+    bind(Clock.class).toInstance(Clock.systemUTC());
+
     bind(MinecraftServer.class).toInstance(server);
 
     install(new ConfigModule());

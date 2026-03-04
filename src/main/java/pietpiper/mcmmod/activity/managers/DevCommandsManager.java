@@ -55,6 +55,7 @@ public class DevCommandsManager {
                       }
 
                       final UUID playerId = uuidOptional.get();
+
                       registerPlayerManager.registerPlayer(playerId, username);
 
                       sendSuccess(context,
@@ -71,47 +72,49 @@ public class DevCommandsManager {
   }
 
   /**
-   * Retrieves and displays player information by ID.
+   * Retrieves and displays player information.
+   *
+   * Accepts either a UUID or a username.
    *
    * @param context The command context
-   * @param playerIdStr The player ID as a string
+   * @param identifier UUID or username
    * @return 1 on completion
    */
   public int getPlayer(
           @NonNull final CommandContext<ServerCommandSource> context,
-          @NonNull final String playerIdStr) {
+          @NonNull final String identifier) {
 
-    return withValidPlayerId(context, playerIdStr, playerId ->
+    return resolvePlayer(context, identifier, playerId ->
             playerBao.getPlayer(playerId).ifPresentOrElse(
                     player -> sendSuccess(context,
                             "Player found: " + player.getUsername() + " (" + player.getId() + ")"),
-                    () -> sendError(context, "Player not found with ID: " + playerIdStr)
-            )
-    );
+                    () -> sendError(context, "Player not found: " + identifier)
+            ));
   }
 
   /**
    * Updates a player's username.
    *
    * @param context The command context
-   * @param playerIdStr The player ID as a string
-   * @param newUsername The new username to set
+   * @param identifier UUID or username
+   * @param newUsername The new username
    * @return 1 on completion
    */
   public int updatePlayer(
           @NonNull final CommandContext<ServerCommandSource> context,
-          @NonNull final String playerIdStr,
+          @NonNull final String identifier,
           @NonNull final String newUsername) {
 
-    return withValidPlayerId(context, playerIdStr, playerId -> {
+    return resolvePlayer(context, identifier, playerId -> {
 
       final boolean success = playerBao.updatePlayerUsername(playerId, newUsername);
 
       if (success) {
-        sendSuccess(context, "Updated player " + playerIdStr + " to: " + newUsername);
+        sendSuccess(context, "Updated player to: " + newUsername);
       } else {
-        sendError(context, "Failed to update player " + playerIdStr);
+        sendError(context, "Failed to update player");
       }
+
     });
   }
 
@@ -119,27 +122,28 @@ public class DevCommandsManager {
    * Deletes a player from the system.
    *
    * @param context The command context
-   * @param playerIdStr The player ID as a string
+   * @param identifier UUID or username
    * @return 1 on completion
    */
   public int deletePlayer(
           @NonNull final CommandContext<ServerCommandSource> context,
-          @NonNull final String playerIdStr) {
+          @NonNull final String identifier) {
 
-    return withValidPlayerId(context, playerIdStr, playerId -> {
+    return resolvePlayer(context, identifier, playerId -> {
 
       final boolean success = playerBao.deletePlayer(playerId);
 
       if (success) {
-        sendSuccess(context, "Deleted player with ID: " + playerIdStr);
+        sendSuccess(context, "Deleted player: " + playerId);
       } else {
-        sendError(context, "Failed to delete player with ID: " + playerIdStr);
+        sendError(context, "Failed to delete player");
       }
+
     });
   }
 
   /**
-   * Lists all players in the database.
+   * Lists all players currently stored in the database.
    *
    * @param context The command context
    * @return 1 on completion
@@ -166,14 +170,14 @@ public class DevCommandsManager {
    * Initializes all skills for a player.
    *
    * @param context The command context
-   * @param playerIdStr The player ID as a string
+   * @param identifier UUID or username
    * @return 1 on completion
    */
   public int initializeSkills(
           @NonNull final CommandContext<ServerCommandSource> context,
-          @NonNull final String playerIdStr) {
+          @NonNull final String identifier) {
 
-    return withValidPlayerId(context, playerIdStr, playerId -> {
+    return resolvePlayer(context, identifier, playerId -> {
       playerSkillBao.initializeSkills(playerId);
       sendSuccess(context, "Initialized skills for player: " + playerId);
     });
@@ -183,16 +187,16 @@ public class DevCommandsManager {
    * Retrieves a specific skill for a player.
    *
    * @param context The command context
-   * @param playerIdStr The player ID as a string
+   * @param identifier UUID or username
    * @param skillStr The skill name
    * @return 1 on completion
    */
   public int getSkill(
           @NonNull final CommandContext<ServerCommandSource> context,
-          @NonNull final String playerIdStr,
+          @NonNull final String identifier,
           @NonNull final String skillStr) {
 
-    return withValidPlayerId(context, playerIdStr, playerId -> {
+    return resolvePlayer(context, identifier, playerId -> {
 
       try {
 
@@ -203,28 +207,27 @@ public class DevCommandsManager {
                         skillData -> sendSuccess(context,
                                 skill + " -> Level=" + skillData.getLevel() +
                                         " XP=" + skillData.getXp()),
-                        () -> sendError(context,
-                                "Skill not found for player: " + skill)
-                );
+                        () -> sendError(context, "Skill not found"));
 
       } catch (IllegalArgumentException e) {
         sendError(context, "Invalid skill: " + skillStr);
       }
+
     });
   }
 
   /**
-   * Lists all skills for a player.
+   * Lists all skills belonging to a player.
    *
    * @param context The command context
-   * @param playerIdStr The player ID as a string
+   * @param identifier UUID or username
    * @return 1 on completion
    */
   public int listSkills(
           @NonNull final CommandContext<ServerCommandSource> context,
-          @NonNull final String playerIdStr) {
+          @NonNull final String identifier) {
 
-    return withValidPlayerId(context, playerIdStr, playerId -> {
+    return resolvePlayer(context, identifier, playerId -> {
 
       final List<PlayerSkill> skills = playerSkillBao.listSkills(playerId);
 
@@ -240,6 +243,7 @@ public class DevCommandsManager {
                       "§7- " + skill.getSkill() +
                               " §8(Level=" + skill.getLevel() +
                               ", XP=" + skill.getXp() + ")"));
+
     });
   }
 
@@ -247,20 +251,20 @@ public class DevCommandsManager {
    * Sets the level and experience for a player's skill.
    *
    * @param context The command context
-   * @param playerIdStr The player ID as a string
-   * @param skillStr The skill name
-   * @param level The level to set
-   * @param xp The experience to set
+   * @param identifier UUID or username
+   * @param skillStr Skill name
+   * @param level Level value
+   * @param xp Experience value
    * @return 1 on completion
    */
   public int setSkill(
           @NonNull final CommandContext<ServerCommandSource> context,
-          @NonNull final String playerIdStr,
+          @NonNull final String identifier,
           @NonNull final String skillStr,
           final int level,
           final long xp) {
 
-    return withValidPlayerId(context, playerIdStr, playerId -> {
+    return resolvePlayer(context, identifier, playerId -> {
 
       try {
 
@@ -273,10 +277,9 @@ public class DevCommandsManager {
           return;
         }
 
-        final PlayerSkill existing = skillOpt.get();
-
         final PlayerSkill updated =
-                existing.withLevel(level)
+                skillOpt.get()
+                        .withLevel(level)
                         .withXp(xp);
 
         final boolean success = playerSkillBao.updateSkill(updated);
@@ -293,39 +296,88 @@ public class DevCommandsManager {
       } catch (IllegalArgumentException e) {
         sendError(context, "Invalid skill: " + skillStr);
       }
+
     });
   }
 
   /**
-   * Executes an action with a validated player UUID.
+   * Resolves a player identifier into a UUID.
+   * <p>
+   * Accepts either a UUID or a username. When resolving usernames,
+   * this method verifies that the database username matches the
+   * Mojang resolved username to avoid identity ambiguity.
    *
-   * @param context The command context
-   * @param playerIdStr The player ID string to validate
-   * @param action The action to execute with the validated UUID
+   * @param context Command context
+   * @param identifier Username or UUID
+   * @param action Action to execute once resolved
    * @return 1 on completion
    */
-  private int withValidPlayerId(
+  private int resolvePlayer(
           @NonNull final CommandContext<ServerCommandSource> context,
-          @NonNull final String playerIdStr,
+          @NonNull final String identifier,
           @NonNull final Consumer<UUID> action) {
 
+    final MinecraftServer server = context.getSource().getServer();
+
     try {
-      final UUID playerId = UUID.fromString(playerIdStr);
+      final UUID playerId = UUID.fromString(identifier);
       action.accept(playerId);
       return 1;
-
-    } catch (IllegalArgumentException e) {
-      sendError(context, "Invalid UUID format: " + playerIdStr);
-      return 1;
     }
+    catch (IllegalArgumentException ignored) {}
+
+    sendFeedback(context, "Resolving Mojang UUID for username: " + identifier + "...");
+
+    playerIdentityBAL.resolveUuid(identifier)
+            .thenAccept(uuidOptional ->
+                    server.execute(() -> {
+
+                      if (uuidOptional.isEmpty()) {
+                        sendError(context, "Username not found: " + identifier);
+                        return;
+                      }
+
+                      final UUID resolvedId = uuidOptional.get();
+                      final Optional<Player> dbPlayer = playerBao.getPlayer(resolvedId);
+
+                      if (dbPlayer.isPresent()) {
+
+                        final Player player = dbPlayer.get();
+
+                        if (!player.getUsername().equalsIgnoreCase(identifier)) {
+
+                          sendError(context, "Player identity ambiguity detected.");
+
+                          sendFeedback(context,
+                                  "Resolved Mojang username: "
+                                          + identifier + " -> " + resolvedId);
+
+                          sendFeedback(context,
+                                  "Database record: "
+                                          + player.getUsername()
+                                          + " -> "
+                                          + player.getId());
+
+                          sendWarning(context,
+                                  "Please run the command again using the UUID.");
+
+                          return;
+                        }
+                      }
+
+                      action.accept(resolvedId);
+
+                    }))
+            .exceptionally(ex -> {
+              server.execute(() ->
+                      sendError(context,
+                              "Failed to resolve Mojang UUID for username: " + identifier));
+              return null;
+            });
+
+    return 1;
   }
 
-  /**
-   * Sends feedback message to the command source.
-   *
-   * @param context The command context
-   * @param message The message to send
-   */
   private void sendFeedback(
           @NonNull final CommandContext<ServerCommandSource> context,
           @NonNull final String message) {
@@ -333,12 +385,6 @@ public class DevCommandsManager {
     context.getSource().sendFeedback(() -> Text.literal(message), false);
   }
 
-  /**
-   * Sends success feedback message to the command source.
-   *
-   * @param context The command context
-   * @param message The success message to send
-   */
   private void sendSuccess(
           @NonNull final CommandContext<ServerCommandSource> context,
           @NonNull final String message) {
@@ -346,12 +392,6 @@ public class DevCommandsManager {
     sendFeedback(context, "§a" + message);
   }
 
-  /**
-   * Sends error feedback message to the command source.
-   *
-   * @param context The command context
-   * @param message The error message to send
-   */
   private void sendError(
           @NonNull final CommandContext<ServerCommandSource> context,
           @NonNull final String message) {
@@ -359,12 +399,6 @@ public class DevCommandsManager {
     sendFeedback(context, "§c" + message);
   }
 
-  /**
-   * Sends warning feedback message to the command source.
-   *
-   * @param context The command context
-   * @param message The warning message to send
-   */
   private void sendWarning(
           @NonNull final CommandContext<ServerCommandSource> context,
           @NonNull final String message) {

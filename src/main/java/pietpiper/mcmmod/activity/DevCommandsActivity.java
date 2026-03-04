@@ -50,6 +50,7 @@ public class DevCommandsActivity {
    * @return The built admin command
    */
   private LiteralArgumentBuilder<ServerCommandSource> buildAdminCommand() {
+
     return literal("admin")
             .requires(source -> source.hasPermissionLevel(2))
 
@@ -58,159 +59,108 @@ public class DevCommandsActivity {
                     .then(buildGetCommand())
                     .then(buildUpdateCommand())
                     .then(buildDeleteCommand())
-                    .then(buildListCommand())
-            )
+                    .then(buildListCommand()))
 
             .then(literal("skill")
                     .then(buildInitSkillsCommand())
                     .then(buildGetSkillCommand())
                     .then(buildListSkillsCommand())
-                    .then(buildSetSkillCommand())
-            );
+                    .then(buildSetSkillCommand()));
   }
 
-  /**
-   * Builds the player register command.
-   *
-   * @return The built register command
-   */
+  /** Builds register command. */
   private LiteralArgumentBuilder<ServerCommandSource> buildRegisterCommand() {
     return literal("register")
             .then(argument("username", StringArgumentType.string())
-                    .executes(context -> devCommandsManager.registerPlayer(
-                            context,
-                            StringArgumentType.getString(context, "username")
-                    ))
-            );
+                    .executes(context ->
+                            devCommandsManager.registerPlayer(
+                                    context,
+                                    StringArgumentType.getString(context, "username"))));
   }
 
-  /**
-   * Builds the player get command.
-   *
-   * @return The built get command
-   */
+  /** Builds get player command. */
   private LiteralArgumentBuilder<ServerCommandSource> buildGetCommand() {
     return literal("get")
-            .then(argument("playerId", StringArgumentType.string())
-                    .executes(context -> devCommandsManager.getPlayer(
-                            context,
-                            StringArgumentType.getString(context, "playerId")
-                    ))
-            );
+            .then(argument("identifier", StringArgumentType.string())
+                    .executes(context ->
+                            devCommandsManager.getPlayer(
+                                    context,
+                                    StringArgumentType.getString(context, "identifier"))));
   }
 
-  /**
-   * Builds the player update command.
-   *
-   * @return The built update command
-   */
+  /** Builds update player command. */
   private LiteralArgumentBuilder<ServerCommandSource> buildUpdateCommand() {
     return literal("update")
-            .then(argument("playerId", StringArgumentType.string())
+            .then(argument("identifier", StringArgumentType.string())
                     .then(argument("newUsername", StringArgumentType.string())
-                            .executes(context -> devCommandsManager.updatePlayer(
-                                    context,
-                                    StringArgumentType.getString(context, "playerId"),
-                                    StringArgumentType.getString(context, "newUsername")
-                            ))
-                    )
-            );
+                            .executes(context ->
+                                    devCommandsManager.updatePlayer(
+                                            context,
+                                            StringArgumentType.getString(context, "identifier"),
+                                            StringArgumentType.getString(context, "newUsername")))));
   }
 
-  /**
-   * Builds the player delete command.
-   *
-   * @return The built delete command
-   */
+  /** Builds delete player command. */
   private LiteralArgumentBuilder<ServerCommandSource> buildDeleteCommand() {
     return literal("delete")
-            .then(argument("playerId", StringArgumentType.string())
-                    .executes(context -> devCommandsManager.deletePlayer(
-                            context,
-                            StringArgumentType.getString(context, "playerId")
-                    ))
-            );
+            .then(argument("identifier", StringArgumentType.string())
+                    .executes(context ->
+                            devCommandsManager.deletePlayer(
+                                    context,
+                                    StringArgumentType.getString(context, "identifier"))));
   }
 
-  /**
-   * Builds the player list command.
-   *
-   * @return The built list command
-   */
+  /** Builds list players command. */
   private LiteralArgumentBuilder<ServerCommandSource> buildListCommand() {
     return literal("list")
             .executes(devCommandsManager::listPlayers);
   }
 
-  /**
-   * Builds the skill initialization command.
-   *
-   * @return The built init command
-   */
+  /** Builds skill init command. */
   private LiteralArgumentBuilder<ServerCommandSource> buildInitSkillsCommand() {
     return literal("init")
-            .then(argument("playerId", StringArgumentType.string())
-                    .executes(context -> devCommandsManager.initializeSkills(
-                            context,
-                            StringArgumentType.getString(context, "playerId")
-                    ))
-            );
+            .then(argument("identifier", StringArgumentType.string())
+                    .executes(context ->
+                            devCommandsManager.initializeSkills(
+                                    context,
+                                    StringArgumentType.getString(context, "identifier"))));
   }
 
-  /**
-   * Builds the skill get command.
-   *
-   * @return The built get command
-   */
+  /** Builds skill get command. */
   private LiteralArgumentBuilder<ServerCommandSource> buildGetSkillCommand() {
     return literal("get")
-            .then(argument("playerId", StringArgumentType.string())
+            .then(argument("identifier", StringArgumentType.string())
                     .then(argument("skill", StringArgumentType.string())
-                            .executes(context -> devCommandsManager.getSkill(
-                                    context,
-                                    StringArgumentType.getString(context, "playerId"),
-                                    StringArgumentType.getString(context, "skill")
-                            ))
-                    )
-            );
+                            .executes(context ->
+                                    devCommandsManager.getSkill(
+                                            context,
+                                            StringArgumentType.getString(context, "identifier"),
+                                            StringArgumentType.getString(context, "skill")))));
   }
 
-  /**
-   * Builds the skill list command.
-   *
-   * @return The built list command
-   */
+  /** Builds skill list command. */
   private LiteralArgumentBuilder<ServerCommandSource> buildListSkillsCommand() {
     return literal("list")
-            .then(argument("playerId", StringArgumentType.string())
-                    .executes(context -> devCommandsManager.listSkills(
-                            context,
-                            StringArgumentType.getString(context, "playerId")
-                    ))
-            );
+            .then(argument("identifier", StringArgumentType.string())
+                    .executes(context ->
+                            devCommandsManager.listSkills(
+                                    context,
+                                    StringArgumentType.getString(context, "identifier"))));
   }
 
-  /**
-   * Builds the skill set command.
-   *
-   * @return The built set command
-   */
+  /** Builds skill set command. */
   private LiteralArgumentBuilder<ServerCommandSource> buildSetSkillCommand() {
     return literal("set")
-            .then(argument("playerId", StringArgumentType.string())
+            .then(argument("identifier", StringArgumentType.string())
                     .then(argument("skill", StringArgumentType.string())
                             .then(argument("level", IntegerArgumentType.integer())
                                     .then(argument("xp", LongArgumentType.longArg())
-                                            .executes(context -> devCommandsManager.setSkill(
-                                                    context,
-                                                    StringArgumentType.getString(context, "playerId"),
-                                                    StringArgumentType.getString(context, "skill"),
-                                                    IntegerArgumentType.getInteger(context, "level"),
-                                                    LongArgumentType.getLong(context, "xp")
-                                            ))
-                                    )
-                            )
-                    )
-            );
+                                            .executes(context ->
+                                                    devCommandsManager.setSkill(
+                                                            context,
+                                                            StringArgumentType.getString(context, "identifier"),
+                                                            StringArgumentType.getString(context, "skill"),
+                                                            IntegerArgumentType.getInteger(context, "level"),
+                                                            LongArgumentType.getLong(context, "xp")))))));
   }
 }
